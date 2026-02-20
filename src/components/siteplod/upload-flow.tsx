@@ -35,18 +35,18 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
   const [deploymentProgress, setDeploymentProgress] = useState(0)
   const [deploymentStatus, setDeploymentStatus] = useState('')
   const [isRegisterLoading, setIsRegisterLoading] = useState(false)
-  
+
   // Email validation state
   const [registerEmail, setRegisterEmail] = useState('')
   const [registerEmailError, setRegisterEmailError] = useState<string | null>(null)
-  
+
   // Password validation state
   const [registerPassword, setRegisterPassword] = useState('')
   const [registerPasswordValidation, setRegisterPasswordValidation] = useState<PasswordValidation | null>(null)
-  
+
   // Username state
   const [registerUsername, setRegisterUsername] = useState('')
-  
+
   // Missing images state
   const [missingImages, setMissingImages] = useState<string[]>([])
   const [showMissingImagesDialog, setShowMissingImagesDialog] = useState(false)
@@ -77,20 +77,20 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
 
       // Store uploaded files for later use
       setUploadedFiles(response.files)
-      
+
       // Small delay for UX
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       setIsProcessing(false)
       setCurrentStep('choice')
-      
+
       toast.success('File uploaded successfully!', {
         id: toastId,
         description: 'Ready to configure deployment'
       })
     } catch (error: any) {
       console.error('Upload error:', error)
-      
+
       // Check if missing images error - ApiError now includes full error data
       if (error.data?.requiresImageUpload && error.data?.missingImages) {
         setMissingImages(error.data.missingImages)
@@ -99,7 +99,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
         toast.dismiss(toastId)
         return
       }
-      
+
       toast.error('Upload failed', {
         id: toastId,
         description: error.message || 'Failed to upload file'
@@ -172,11 +172,11 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
 
   const checkSlugAvailability = async (value: string) => {
     setSlug(value)
-    
+
     // Reset availability state
     setSlugAvailable(null)
     setSlugError(null)
-    
+
     // Validate slug format first
     const validation = validateSlug(value)
     if (!validation.valid) {
@@ -184,10 +184,10 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
       setIsCheckingSlug(false)
       return
     }
-    
+
     // Show loading state
     setIsCheckingSlug(true)
-    
+
     try {
       const response = await apiClient.checkSlug(value)
       setSlugAvailable(response.available)
@@ -213,28 +213,28 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
       }
       // User is logged in, proceed with deployment
     }
-    
+
     setCurrentStep('deploying')
     setDeploymentProgress(0)
     setDeploymentStatus('Initializing deployment...')
-    
+
     const toastId = toast.loading('Deploying site...', {
       description: 'Setting up your site on our servers'
     })
-    
+
     try {
       // Update progress stages
       setDeploymentProgress(20)
       setDeploymentStatus('Validating files...')
       await new Promise(resolve => setTimeout(resolve, 400))
-      
+
       setDeploymentProgress(40)
       setDeploymentStatus('Creating site structure...')
       await new Promise(resolve => setTimeout(resolve, 400))
-      
+
       setDeploymentProgress(60)
       setDeploymentStatus('Uploading assets...')
-      
+
       // Create site with uploaded files
       const site = await apiClient.createSite({
         name: slug,
@@ -242,20 +242,20 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
         managed: isManaged || false,
         files: uploadedFiles
       })
-      
+
       setDeploymentProgress(80)
       setDeploymentStatus('Configuring server...')
       await new Promise(resolve => setTimeout(resolve, 400))
-      
+
       setDeploymentProgress(100)
       setDeploymentStatus('Finalizing deployment...')
       await new Promise(resolve => setTimeout(resolve, 300))
-      
+
       setCurrentStep('success')
-      
+
       toast.success('Site deployed successfully!', {
         id: toastId,
-        description: `Your site is now live at siteplod.com/s/${slug}`
+        description: `Your site is now live at siteplod.vercel.app/s/${slug}`
       })
     } catch (error: any) {
       console.error('Deployment error:', error)
@@ -270,7 +270,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
   const handleRegister = async () => {
     // Prevent double submission
     if (isRegisterLoading) return
-    
+
     // Validate all fields
     if (!registerUsername || !registerEmail || !registerPassword) {
       toast.error('All fields required', {
@@ -278,39 +278,39 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
       })
       return
     }
-    
+
     if (registerEmailError) {
       toast.error('Invalid email', {
         description: 'Please enter a valid email address'
       })
       return
     }
-    
+
     if (registerPasswordValidation?.error) {
       toast.error('Invalid password', {
         description: 'Please meet all password requirements'
       })
       return
     }
-    
+
     setIsRegisterLoading(true)
-    
+
     try {
       const response = await apiClient.register({
         username: registerUsername,
         email: registerEmail,
         password: registerPassword
       })
-      
+
       toast.success('Account created successfully!', {
         description: 'You can now manage your sites'
       })
-      
+
       // Dispatch event for other components
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('auth-state-changed'))
       }
-      
+
       setRegisterDialogOpen(false)
       resetRegisterForm()
       setCurrentStep('slug')
@@ -326,15 +326,15 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
 
   const handleRegisterEmailChange = (value: string) => {
     setRegisterEmail(value)
-    
+
     // Real-time validation
     const validation = validateEmail(value)
     setRegisterEmailError(validation.valid ? null : validation.error || null)
   }
-  
+
   const handleRegisterPasswordChange = (value: string) => {
     setRegisterPassword(value)
-    
+
     // Real-time validation
     const validation = validatePassword(value)
     setRegisterPasswordValidation(validation)
@@ -347,21 +347,21 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
     setRegisterPassword('')
     setRegisterPasswordValidation(null)
   }
-  
+
   const handleImagesUploaded = async (imageMap: Record<string, string>) => {
     setUploadedImageMap(imageMap)
     setShowMissingImagesDialog(false)
-    
+
     toast.success('Images uploaded!', {
       description: 'Processing your site...'
     })
-    
+
     if (!uploadedFile) return
-    
+
     try {
       // Read the HTML file content
       const htmlContent = await uploadedFile.text()
-      
+
       // Replace local image paths with uploaded URLs
       let modifiedHtml = htmlContent
       for (const [localPath, uploadedUrl] of Object.entries(imageMap)) {
@@ -372,7 +372,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
           new RegExp(`url\\(["']?${localPath}["']?\\)`, 'gi'),
           new RegExp(`url\\(["']?\./${localPath}["']?\\)`, 'gi'),
         ]
-        
+
         for (const pattern of patterns) {
           if (pattern.toString().includes('src=')) {
             modifiedHtml = modifiedHtml.replace(pattern, `src="${uploadedUrl}"`)
@@ -381,12 +381,12 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
           }
         }
       }
-      
+
       // Create a new File object with modified content
       const modifiedFile = new File([modifiedHtml], uploadedFile.name, {
         type: uploadedFile.type
       })
-      
+
       // Upload the modified file
       setUploadedFile(modifiedFile)
       await handleFileUpload(modifiedFile)
@@ -426,12 +426,12 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
               <div
                 className={cn(
                   'w-10 h-10 border-2 flex items-center justify-center font-display text-sm transition-all duration-300',
-                  currentStep === step || 
-                  currentStep === 'uploading' && step === 'upload' ||
-                  (currentStep === 'deploying' && step === 'slug') ||
-                  (currentStep === 'success' && index < 3) ||
-                  (currentStep === 'slug' && index < 2) ||
-                  (currentStep === 'choice' && index < 1)
+                  currentStep === step ||
+                    currentStep === 'uploading' && step === 'upload' ||
+                    (currentStep === 'deploying' && step === 'slug') ||
+                    (currentStep === 'success' && index < 3) ||
+                    (currentStep === 'slug' && index < 2) ||
+                    (currentStep === 'choice' && index < 1)
                     ? 'border-gold text-gold bg-gold/10'
                     : 'border-gold/30 text-pewter'
                 )}
@@ -443,8 +443,8 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                   className={cn(
                     'w-12 h-0.5 mx-2 transition-all duration-300',
                     (currentStep === 'slug' && index < 2) ||
-                    (currentStep === 'success' && index < 3) ||
-                    (currentStep === 'deploying' && index < 2)
+                      (currentStep === 'success' && index < 3) ||
+                      (currentStep === 'deploying' && index < 2)
                       ? 'bg-gold'
                       : 'bg-gold/20'
                   )}
@@ -482,7 +482,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                   onChange={handleFileSelect}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                
+
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-16 h-16 bg-obsidian border border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
                     <Upload className="w-8 h-8 text-gold group-hover:scale-110 transition-transform" />
@@ -536,7 +536,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                 {isProcessing ? 'Processing File' : 'Uploading File'}
               </CardTitle>
               <CardDescription className="text-base">
-                {isProcessing 
+                {isProcessing
                   ? 'Analyzing and preparing your site...'
                   : 'Please wait while we upload your file'
                 }
@@ -568,8 +568,8 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                       <span className="text-pewter">Upload Progress</span>
                       <span className="text-gold font-medium">{uploadProgress}%</span>
                     </div>
-                    <Progress 
-                      value={uploadProgress} 
+                    <Progress
+                      value={uploadProgress}
                       className="h-3 bg-obsidian border border-gold/30"
                     />
                     <p className="text-pewter text-xs text-center">
@@ -612,7 +612,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                 >
                   <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-gold/40 group-hover:border-gold transition-colors" aria-hidden="true" />
                   <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-gold/40 group-hover:border-gold transition-colors" aria-hidden="true" />
-                  
+
                   <Globe className="w-10 h-10 text-gold mb-4" />
                   <h3 className="font-display text-xl text-gold uppercase tracking-widest mb-2">
                     Unmanaged
@@ -634,11 +634,11 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                 >
                   <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-gold group-hover:opacity-100 transition-opacity" aria-hidden="true" />
                   <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-gold group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-                  
+
                   <div className="absolute -top-3 right-4 px-3 py-1 bg-gold text-obsidian text-xs uppercase tracking-widest">
                     Recommended
                   </div>
-                  
+
                   <User className="w-10 h-10 text-gold mb-4" />
                   <h3 className="font-display text-xl text-gold uppercase tracking-widest mb-2">
                     Managed
@@ -679,7 +679,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                 <div className="space-y-2">
                   <Label htmlFor="slug">Site Slug</Label>
                   <div className="flex items-center gap-2">
-                    <span className="text-pewter text-sm whitespace-nowrap">siteplod.com/s/</span>
+                    <span className="text-pewter text-sm whitespace-nowrap">siteplod.vercel.app/s/</span>
                     <div className="relative flex-1">
                       <Input
                         id="slug"
@@ -710,8 +710,8 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                     slugError
                       ? 'border-red-500/30 bg-red-500/5'
                       : slugAvailable
-                      ? 'border-green-500/30 bg-green-500/5'
-                      : 'border-red-500/30 bg-red-500/5'
+                        ? 'border-green-500/30 bg-green-500/5'
+                        : 'border-red-500/30 bg-red-500/5'
                   )}>
                     <div className="flex items-center gap-2">
                       {slugError ? (
@@ -736,7 +736,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                 <div className="p-6 bg-obsidian border border-gold/20 text-center">
                   <p className="text-pewter text-sm mb-2">Your site will be live at:</p>
                   <p className="font-mono text-gold text-lg">
-                    siteplod.com/s/{slug || 'your-slug'}
+                    siteplod.vercel.app/s/{slug || 'your-slug'}
                   </p>
                 </div>
 
@@ -802,8 +802,8 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                     <span className="text-pewter">Deployment Progress</span>
                     <span className="text-gold font-medium">{deploymentProgress}%</span>
                   </div>
-                  <Progress 
-                    value={deploymentProgress} 
+                  <Progress
+                    value={deploymentProgress}
                     className="h-3 bg-obsidian border border-gold/30"
                   />
                 </div>
@@ -856,23 +856,23 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
               <p className="text-pewter text-lg mb-8">
                 Your site is now live and accessible to the world.
               </p>
-              
+
               <div className="p-4 bg-obsidian border border-gold/30 max-w-md mx-auto mb-8">
                 <p className="text-pewter text-sm mb-1">Your live URL:</p>
                 <a
-                  href={`https://siteplod.com/s/${slug}`}
+                  href={`https://siteplod.vercel.app/s/${slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono text-gold text-lg hover:underline"
                 >
-                  siteplod.com/s/{slug}
+                  siteplod.vercel.app/s/{slug}
                 </a>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button
                   variant="solid"
-                  onClick={() => window.open(`https://siteplod.com/s/${slug}`, '_blank')}
+                  onClick={() => window.open(`https://siteplod.vercel.app/s/${slug}`, '_blank')}
                   className="gap-2"
                 >
                   <Globe className="w-4 h-4" />
@@ -911,31 +911,31 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
               Register to manage your sites with full dashboard access.
             </DialogDescription>
           </DialogHeader>
-          
+
           <form className="space-y-6 pt-4" onSubmit={async (e) => {
             e.preventDefault()
             await handleRegister()
           }}>
             <div className="space-y-2">
               <Label htmlFor="reg-username">Username</Label>
-              <Input 
-                id="reg-username" 
-                placeholder="johndoe" 
+              <Input
+                id="reg-username"
+                placeholder="johndoe"
                 value={registerUsername}
                 onChange={(e) => setRegisterUsername(e.target.value)}
-                required 
-                disabled={isRegisterLoading} 
+                required
+                disabled={isRegisterLoading}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="reg-email">Email</Label>
-              <Input 
-                id="reg-email" 
-                type="email" 
-                placeholder="you@example.com" 
+              <Input
+                id="reg-email"
+                type="email"
+                placeholder="you@example.com"
                 value={registerEmail}
                 onChange={(e) => handleRegisterEmailChange(e.target.value)}
-                required 
+                required
                 disabled={isRegisterLoading}
                 className={registerEmailError ? 'border-red-500' : !registerEmailError && registerEmail ? 'border-green-500' : ''}
               />
@@ -950,13 +950,13 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="reg-password">Password</Label>
-              <Input 
-                id="reg-password" 
-                type="password" 
-                placeholder="••••••••" 
+              <Input
+                id="reg-password"
+                type="password"
+                placeholder="••••••••"
                 value={registerPassword}
                 onChange={(e) => handleRegisterPasswordChange(e.target.value)}
-                required 
+                required
                 disabled={isRegisterLoading}
                 className={registerPasswordValidation?.error ? 'border-red-500' : !registerPasswordValidation?.error && registerPassword ? 'border-green-500' : ''}
               />
@@ -968,7 +968,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                   {/* Strength indicator */}
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-2 bg-obsidian border border-gold/30 overflow-hidden">
-                      <div 
+                      <div
                         className={cn(
                           'h-full transition-all duration-300',
                           registerPasswordValidation.strength === 'weak' && 'w-1/4 bg-red-500',
@@ -988,7 +988,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                       {registerPasswordValidation.strength}
                     </span>
                   </div>
-                  
+
                   {/* Requirements list */}
                   <div className="text-xs space-y-1">
                     <div className={cn(
@@ -1030,7 +1030,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
                 </div>
               )}
             </div>
-            
+
             <div className="flex flex-col gap-3">
               <Button type="submit" className="w-full" disabled={isRegisterLoading}>
                 {isRegisterLoading ? (
@@ -1055,7 +1055,7 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
           </form>
         </DialogContent>
       </Dialog>
-      
+
       {/* Missing Images Dialog */}
       <MissingImagesDialog
         open={showMissingImagesDialog}

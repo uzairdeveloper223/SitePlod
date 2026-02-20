@@ -309,7 +309,7 @@ What You Can Do:
 - 🖼️ Image Hosting – Automatic image upload and hosting
 - 🔗 Custom URLs – Get clean, memorable URLs for your sites
 
-Get started now: https://uzair.is-a.dev
+Get started now: https://siteplod.vercel.app
 
 Need help? Contact us at contact@uzair.is-a.dev
 

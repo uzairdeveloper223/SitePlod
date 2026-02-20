@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { 
-  Eye, 
-  Globe, 
-  TrendingUp, 
+import {
+  Eye,
+  Globe,
+  TrendingUp,
   Calendar,
   ExternalLink,
   ArrowLeft,
@@ -37,7 +37,7 @@ export default function AnalyticsPage() {
   const loadAnalytics = async () => {
     try {
       setLoading(true)
-      
+
       // Fetch analytics data from API
       const data = await apiClient.getAnalytics(siteId)
       setAnalytics(data)
@@ -54,7 +54,7 @@ export default function AnalyticsPage() {
 
   const getChartData = () => {
     if (!analytics) return []
-    
+
     switch (viewPeriod) {
       case 'daily':
         return analytics.dailyViews.map(item => ({
@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
             </h1>
             {analytics && (
               <p className="text-pewter mt-2">
-                {analytics.siteName} • siteplod.com/s/{analytics.slug}
+                {analytics.siteName} • siteplod.vercel.app/s/{analytics.slug}
               </p>
             )}
           </div>
@@ -146,7 +146,7 @@ export default function AnalyticsPage() {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://siteplod.com/s/${analytics.slug}`)
+                      navigator.clipboard.writeText(`https://siteplod.vercel.app/s/${analytics.slug}`)
                       toast.success('Link copied!', {
                         description: 'Site URL copied to clipboard'
                       })
@@ -187,12 +187,12 @@ export default function AnalyticsPage() {
               <div className="flex items-center gap-3 text-pewter">
                 <span className="text-champagne font-medium">{analytics.siteName}</span>
                 <span>•</span>
-                <span>siteplod.com/s/{analytics.slug}</span>
+                <span>siteplod.vercel.app/s/{analytics.slug}</span>
               </div>
             </div>
             <Button
               variant="outline"
-              onClick={() => window.open(`https://siteplod.com/s/${analytics.slug}`, '_blank')}
+              onClick={() => window.open(`https://siteplod.vercel.app/s/${analytics.slug}`, '_blank')}
               className="gap-2"
             >
               <ExternalLink className="w-4 h-4" />
@@ -204,21 +204,21 @@ export default function AnalyticsPage() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {[
-            { 
-              label: 'Total Views', 
-              value: analytics.totalViews.toLocaleString(), 
+            {
+              label: 'Total Views',
+              value: analytics.totalViews.toLocaleString(),
               icon: Eye,
               description: 'All-time page views'
             },
-            { 
-              label: 'Site URL', 
-              value: analytics.slug, 
+            {
+              label: 'Site URL',
+              value: analytics.slug,
               icon: Globe,
               description: 'Public site identifier'
             },
-            { 
-              label: 'Tracking', 
-              value: 'Active', 
+            {
+              label: 'Tracking',
+              value: 'Active',
               icon: TrendingUp,
               description: 'Real-time analytics'
             }
@@ -286,20 +286,20 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={getChartData()}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} />
-                  <XAxis 
-                    dataKey="name" 
+                  <XAxis
+                    dataKey="name"
                     stroke="#8B8680"
                     style={{ fontSize: '12px' }}
                   />
-                  <YAxis 
+                  <YAxis
                     stroke="#8B8680"
                     style={{ fontSize: '12px' }}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="views" 
-                    stroke="#D4AF37" 
+                  <Line
+                    type="monotone"
+                    dataKey="views"
+                    stroke="#D4AF37"
                     strokeWidth={2}
                     dot={{ fill: '#D4AF37', r: 4 }}
                     activeDot={{ r: 6 }}
@@ -317,7 +317,7 @@ export default function AnalyticsPage() {
             <div>
               <p className="text-champagne text-sm font-medium">Analytics Information</p>
               <p className="text-pewter text-sm mt-1">
-                View counts are updated in real-time as visitors access your site. 
+                View counts are updated in real-time as visitors access your site.
                 Data is aggregated by day, week, and month for trend analysis.
               </p>
             </div>

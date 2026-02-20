@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SitePlod - Deploy Static Sites in Seconds",
     description: "Upload your HTML, CSS, and JS files and deploy them instantly. Free static site hosting with custom URLs.",
-    url: "https://siteplod.com",
+    url: "https://siteplod.vercel.app",
     siteName: "SitePlod",
     type: "website",
   },

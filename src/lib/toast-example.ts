@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 // Success toast example
 export function showSuccessToast() {
   toast.success('Site deployed successfully!', {
-    description: 'Your site is now live at siteplod.com/s/my-site'
+    description: 'Your site is now live at siteplod.vercel.app/s/my-site'
   })
 }
 
@@ -27,12 +27,12 @@ export function showInfoToast() {
 // Loading toast example
 export function showLoadingToast() {
   const toastId = toast.loading('Deploying site...')
-  
+
   // Later, update the loading toast to success
   setTimeout(() => {
     toast.success('Deployed!', { id: toastId })
   }, 3000)
-  
+
   return toastId
 }
 

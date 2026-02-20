@@ -23,7 +23,7 @@ const steps = [
     numeral: 'III',
     icon: Globe,
     title: 'Pick Your Slug',
-    description: 'Select a unique URL slug for your site. Your site will be live at siteplod.com/s/your-slug. Check availability and claim your custom URL.',
+    description: 'Select a unique URL slug for your site. Your site will be live at siteplod.vercel.app/s/your-slug. Check availability and claim your custom URL.',
     color: 'from-gold/20 to-transparent'
   },
   {
@@ -46,11 +46,11 @@ export function HowItWorksSection({ onNavigate }: HowItWorksSectionProps) {
         title="How It Works"
         subtitle="Four simple steps to deploy your static website. No complexity, no configuration, just results."
       />
-      
+
       <div className="relative">
         {/* Connecting line */}
         <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent -translate-y-1/2" aria-hidden="true" />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-4">
           {steps.map((step, index) => {
             const Icon = step.icon
@@ -61,19 +61,19 @@ export function HowItWorksSection({ onNavigate }: HowItWorksSectionProps) {
                   {/* Corner decorations */}
                   <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-gold/40 transition-all duration-300 group-hover:border-gold" aria-hidden="true" />
                   <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-gold/40 transition-all duration-300 group-hover:border-gold" aria-hidden="true" />
-                  
+
                   {/* Number badge */}
                   <div className="absolute -top-4 left-6">
                     <RomanNumeral numeral={step.numeral} />
                   </div>
-                  
+
                   {/* Icon */}
                   <div className="mt-4 mb-6">
                     <div className="w-14 h-14 bg-obsidian border border-gold/30 flex items-center justify-center transition-all duration-300 group-hover:border-gold group-hover:shadow-gold">
                       <Icon className="w-7 h-7 text-gold" />
                     </div>
                   </div>
-                  
+
                   {/* Content */}
                   <h3 className="font-display text-xl text-gold uppercase tracking-widest mb-3">
                     {step.title}
@@ -81,7 +81,7 @@ export function HowItWorksSection({ onNavigate }: HowItWorksSectionProps) {
                   <p className="text-pewter text-sm leading-relaxed">
                     {step.description}
                   </p>
-                  
+
                   {/* Arrow (except last) */}
                   {index < steps.length - 1 && (
                     <div className="hidden lg:flex absolute -right-6 top-1/2 -translate-y-1/2 z-10">
@@ -94,7 +94,7 @@ export function HowItWorksSection({ onNavigate }: HowItWorksSectionProps) {
           })}
         </div>
       </div>
-      
+
       {/* CTA */}
       <div className="text-center mt-16">
         <Button size="lg" variant="solid" onClick={() => onNavigate?.('upload')}>

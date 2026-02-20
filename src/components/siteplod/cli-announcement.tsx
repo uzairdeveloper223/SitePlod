@@ -13,10 +13,10 @@ export function CLIAnnouncement() {
           {/* Decorative corners */}
           <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-gold/40" aria-hidden="true" />
           <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-gold/40" aria-hidden="true" />
-          
+
           {/* Sunburst effect */}
           <div className="absolute inset-0 sunburst opacity-30" aria-hidden="true" />
-          
+
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             {/* Terminal icon */}
             <div className="flex-shrink-0">
@@ -28,7 +28,7 @@ export function CLIAnnouncement() {
                 <div className="absolute inset-0 border-2 border-gold/30 animate-pulse" aria-hidden="true" />
               </div>
             </div>
-            
+
             {/* Content */}
             <div className="flex-1 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
@@ -37,16 +37,16 @@ export function CLIAnnouncement() {
                   Coming Soon
                 </span>
               </div>
-              
+
               <h2 className="font-display text-3xl md:text-4xl text-gold uppercase tracking-widest mb-4">
                 CLI Support
               </h2>
-              
+
               <p className="text-pewter text-lg leading-relaxed mb-6">
-                Deploy directly from your terminal. Integrate SitePlod into your CI/CD pipeline 
+                Deploy directly from your terminal. Integrate SitePlod into your CI/CD pipeline
                 and automate your deployment workflow. One command is all it takes.
               </p>
-              
+
               {/* Code preview */}
               <div className="bg-obsidian border border-gold/20 p-4 font-mono text-sm mb-6 overflow-x-auto">
                 <div className="flex items-center gap-2 mb-2">
@@ -59,10 +59,10 @@ export function CLIAnnouncement() {
                   <span className="text-gold">npx</span> siteplod deploy ./dist
                   <br />
                   <span className="text-green-400">✓</span> Deployed to:{' '}
-                  <span className="text-gold">siteplod.com/s/my-project</span>
+                  <span className="text-gold">siteplod.vercel.app/s/my-project</span>
                 </code>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
                 <Button variant="solid" className="group">
                   Get Notified
@@ -75,7 +75,7 @@ export function CLIAnnouncement() {
             </div>
           </div>
         </div>
-        
+
         {/* Feature highlights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
           {[

@@ -1,11 +1,11 @@
 'use client'
 
-import { 
-  Zap, 
-  Globe, 
-  Shield, 
-  Code, 
-  Layers, 
+import {
+  Zap,
+  Globe,
+  Shield,
+  Code,
+  Layers,
   Terminal,
   Upload,
   Link,
@@ -25,7 +25,7 @@ const features = [
     icon: Globe,
     numeral: 'II',
     title: 'Custom URLs',
-    description: 'Choose your own memorable slug for your site. Get a clean, shareable URL like siteplod.com/s/your-project that you can share with anyone.'
+    description: 'Choose your own memorable slug for your site. Get a clean, shareable URL like siteplod.vercel.app/s/your-project that you can share with anyone.'
   },
   {
     icon: Shield,
@@ -60,7 +60,7 @@ export function FeaturesSection() {
         title="Features"
         subtitle="Everything you need to deploy and manage your static websites with elegance and simplicity."
       />
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature, index) => {
           const Icon = feature.icon

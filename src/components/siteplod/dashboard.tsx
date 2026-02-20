@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { 
-  Globe, 
-  Clock, 
+import {
+  Globe,
+  Clock,
   MoreVertical,
   Plus,
   ExternalLink,
@@ -95,7 +95,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [siteToDelete, setSiteToDelete] = useState<Site | null>(null)
-  
+
   // Editor state
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
   const [fileContent, setFileContent] = useState<string>('')
@@ -105,15 +105,15 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [editedSiteName, setEditedSiteName] = useState('')
   const [savingSiteName, setSavingSiteName] = useState(false)
-  
+
   useEffect(() => {
     loadSites()
   }, [])
-  
+
   const loadSites = async () => {
     try {
       setLoading(true)
-      
+
       // Check if user is authenticated
       const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
       if (!token) {
@@ -122,13 +122,13 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
         setLoading(false)
         return
       }
-      
+
       const fetchedSites = await apiClient.getSites()
       setSites(fetchedSites)
     } catch (error) {
       console.error('Failed to load sites:', error)
       const errorMessage = handleApiError(error)
-      
+
       // If unauthorized, clear token and show empty state
       if ((error as any).statusCode === 401) {
         if (typeof window !== 'undefined') {
@@ -144,11 +144,11 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
       setLoading(false)
     }
   }
-  
+
   const getTotalViews = () => {
     return sites.reduce((sum, site) => sum + site.views, 0)
   }
-  
+
   const getLastUpdated = () => {
     if (sites.length === 0) return 'Never'
     const mostRecent = sites.reduce((latest, site) => {
@@ -159,12 +159,12 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
     if (daysSince === 1) return '1 day ago'
     return `${daysSince} days ago`
   }
-  
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
     const daysDiff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
-    
+
     if (daysDiff === 0) return 'Today'
     if (daysDiff === 1) return 'Yesterday'
     if (daysDiff < 7) return `${daysDiff} days ago`
@@ -173,33 +173,33 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
   }
 
   const handleCopySlug = (slug: string) => {
-    navigator.clipboard.writeText(`siteplod.com/s/${slug}`)
+    navigator.clipboard.writeText(`siteplod.vercel.app/s/${slug}`)
     setCopiedSlug(slug)
     setTimeout(() => setCopiedSlug(null), 2000)
-    
+
     toast.success('Link copied!', {
       description: 'Site URL copied to clipboard'
     })
   }
-  
+
   const handleDeleteClick = (site: Site) => {
     setSiteToDelete(site)
     setDeleteDialogOpen(true)
   }
-  
+
   const handleDeleteConfirm = async () => {
     if (!siteToDelete) return
-    
+
     try {
       await apiClient.deleteSite(siteToDelete.id)
-      
+
       toast.success('Site deleted', {
         description: `${siteToDelete.name} has been permanently deleted`
       })
-      
+
       setDeleteDialogOpen(false)
       setSiteToDelete(null)
-      
+
       // Remove site from local state
       setSites(sites.filter(s => s.id !== siteToDelete.id))
     } catch (error) {
@@ -210,7 +210,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
       })
     }
   }
-  
+
   const handleEditSite = async (site: Site) => {
     try {
       setLoadingFile(true)
@@ -219,11 +219,11 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
       setSelectedSite(siteWithFiles)
       setEditedSiteName(siteWithFiles.name)
       setShowEditor(true)
-      
+
       // Auto-select first HTML file or index.html
       const files = siteWithFiles.files || []
       const indexFile = files.find(f => f.path === 'index.html') || files.find(f => f.mime_type.includes('html')) || files[0]
-      
+
       if (indexFile) {
         await loadFileContent(siteWithFiles.id, indexFile.path)
       }
@@ -237,15 +237,15 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
       setLoadingFile(false)
     }
   }
-  
+
   const loadFileContent = async (siteId: string, filePath: string) => {
     try {
       setLoadingFile(true)
       setSelectedFile(filePath)
-      
+
       const fileData = await apiClient.getFileContent(siteId, filePath)
       const content = fileData.content || ''
-      
+
       setFileContent(content)
       setOriginalContent(content)
       setHasUnsavedChanges(false)
@@ -259,20 +259,20 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
       setLoadingFile(false)
     }
   }
-  
+
   const handleSaveFile = async () => {
     if (!selectedSite || !selectedFile) return
-    
+
     try {
       setSavingFile(true)
-      
+
       await apiClient.updateFileContent(selectedSite.id, selectedFile, {
         content: fileContent
       })
-      
+
       setOriginalContent(fileContent)
       setHasUnsavedChanges(false)
-      
+
       toast.success('File saved', {
         description: 'Your changes have been published'
       })
@@ -286,20 +286,20 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
       setSavingFile(false)
     }
   }
-  
+
   const handleSaveSiteName = async () => {
     if (!selectedSite || editedSiteName === selectedSite.name) return
-    
+
     try {
       setSavingSiteName(true)
-      
+
       const updatedSite = await apiClient.updateSite(selectedSite.id, {
         name: editedSiteName
       })
-      
+
       setSelectedSite({ ...selectedSite, ...updatedSite })
       setSites(sites.map(s => s.id === updatedSite.id ? updatedSite : s))
-      
+
       toast.success('Site name updated', {
         description: 'Your site name has been changed'
       })
@@ -313,12 +313,12 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
       setSavingSiteName(false)
     }
   }
-  
+
   const handleContentChange = (newContent: string) => {
     setFileContent(newContent)
     setHasUnsavedChanges(newContent !== originalContent)
   }
-  
+
   const handleCloseEditor = () => {
     if (hasUnsavedChanges) {
       if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
@@ -332,12 +332,12 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
     setOriginalContent('')
     setHasUnsavedChanges(false)
   }
-  
+
   const getFileIcon = (path: string) => {
     if (path.endsWith('/')) return Folder
     return File
   }
-  
+
   const getFileExtension = (path: string) => {
     const parts = path.split('.')
     return parts.length > 1 ? parts[parts.length - 1] : ''
@@ -469,7 +469,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
                         </div>
                         <div>
                           <CardTitle className="text-lg">{site.name}</CardTitle>
-                          <p className="text-pewter text-xs">siteplod.com/s/{site.slug}</p>
+                          <p className="text-pewter text-xs">siteplod.vercel.app/s/{site.slug}</p>
                         </div>
                       </div>
                       <DropdownMenu>
@@ -494,7 +494,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
                             Copy URL
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => window.open(`https://siteplod.com/s/${site.slug}`, '_blank')}
+                            onClick={() => window.open(`https://siteplod.vercel.app/s/${site.slug}`, '_blank')}
                             className="gap-2"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -559,7 +559,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
                       variant="ghost"
                       size="sm"
                       className="gap-2"
-                      onClick={() => window.open(`https://siteplod.com/s/${site.slug}`, '_blank')}
+                      onClick={() => window.open(`https://siteplod.vercel.app/s/${site.slug}`, '_blank')}
                     >
                       <ExternalLink className="w-4 h-4" />
                     </Button>
@@ -601,7 +601,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
                     disabled={savingSiteName}
                   />
                   {savingSiteName && <Loader2 className="w-4 h-4 text-gold animate-spin" />}
-                  <p className="text-pewter text-xs">siteplod.com/s/{selectedSite.slug}</p>
+                  <p className="text-pewter text-xs">siteplod.vercel.app/s/{selectedSite.slug}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -611,18 +611,18 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
                     Unsaved changes
                   </span>
                 )}
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="gap-2"
                   onClick={() => window.open(`/s/${selectedSite.slug}`, '_blank')}
                 >
                   <Eye className="w-4 h-4" />
                   Preview
                 </Button>
-                <Button 
-                  variant="solid" 
-                  size="sm" 
+                <Button
+                  variant="solid"
+                  size="sm"
                   className="gap-2"
                   onClick={handleSaveFile}
                   disabled={!hasUnsavedChanges || savingFile || !selectedFile}
@@ -666,7 +666,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
                         const Icon = getFileIcon(file.path)
                         const isSelected = selectedFile === file.path
                         const ext = getFileExtension(file.path)
-                        
+
                         return (
                           <button
                             key={file.id}
@@ -719,7 +719,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
                         <span>{new Blob([fileContent]).size} bytes</span>
                       </div>
                     </div>
-                    
+
                     {/* Editor Content */}
                     <div className="flex-1 overflow-auto p-4">
                       <div className="font-mono text-sm leading-relaxed">
@@ -730,13 +730,13 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
                               <div key={i} className="leading-6 h-6">{i + 1}</div>
                             ))}
                           </div>
-                          
+
                           {/* Editable Content */}
                           <textarea
                             value={fileContent}
                             onChange={(e) => handleContentChange(e.target.value)}
                             className="flex-1 bg-transparent text-champagne outline-none resize-none font-mono leading-6 min-h-full"
-                            style={{ 
+                            style={{
                               tabSize: 2,
                               caretColor: '#D4AF37'
                             }}
@@ -759,7 +759,7 @@ export function Dashboard({ onNavigate, isLoading: initialLoading = false }: Das
           </div>
         )}
       </div>
-      
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
