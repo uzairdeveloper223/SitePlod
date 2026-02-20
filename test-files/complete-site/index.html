@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Test Site</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">🚀 SitePlod Test</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>Complete Site Test</h1>
+            <p class="subtitle">Testing multi-file upload with CSS and JavaScript</p>
+            <button class="cta-button" onclick="showAlert()">Test JavaScript</button>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Features Being Tested</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">📁</div>
+                    <h3>Multi-File Upload</h3>
+                    <p>Testing ZIP extraction and file organization</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🎨</div>
+                    <h3>CSS Styling</h3>
+                    <p>External stylesheet loading from css/style.css</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚡</div>
+                    <h3>JavaScript</h3>
+                    <p>External script loading from js/app.js</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🔗</div>
+                    <h3>File Paths</h3>
+                    <p>Testing nested directory structure</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About This Test</h2>
+            <p>This is a complete test site with multiple files:</p>
+            <ul class="file-list">
+                <li>📄 index.html (this file)</li>
+                <li>🎨 css/style.css (external stylesheet)</li>
+                <li>⚡ js/app.js (external script)</li>
+            </ul>
+            <p class="status" id="status">Checking file loading status...</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 SitePlod Test Site. All files uploaded successfully!</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

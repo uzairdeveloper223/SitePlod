@@ -1,0 +1,496 @@
+@import "tailwindcss";
+
+@import "tw-animate-css";
+
+/* Art Deco Design System - SitePlod */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Josefin Sans', sans-serif;
+  --font-display: 'Marcellus', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+}
+
+/* Art Deco Dark Theme - The "Gatsby" Aesthetic */
+:root {
+  --radius: 0px;
+  
+  /* Core Art Deco Colors */
+  --obsidian: #0A0A0A;
+  --charcoal: #141414;
+  --champagne: #F2F0E4;
+  --gold: #D4AF37;
+  --gold-light: #F2E8C4;
+  --gold-dark: #B8960C;
+  --midnight: #1E3D59;
+  --pewter: #888888;
+  
+  /* Semantic Colors */
+  --background: #0A0A0A;
+  --foreground: #F2F0E4;
+  --card: #141414;
+  --card-foreground: #F2F0E4;
+  --popover: #141414;
+  --popover-foreground: #F2F0E4;
+  --primary: #D4AF37;
+  --primary-foreground: #0A0A0A;
+  --secondary: #1E3D59;
+  --secondary-foreground: #F2F0E4;
+  --muted: #1A1A1A;
+  --muted-foreground: #888888;
+  --accent: #D4AF37;
+  --accent-foreground: #0A0A0A;
+  --destructive: #DC3545;
+  --border: rgba(212, 175, 55, 0.3);
+  --input: rgba(212, 175, 55, 0.2);
+  --ring: #D4AF37;
+  
+  /* Chart Colors */
+  --chart-1: #D4AF37;
+  --chart-2: #1E3D59;
+  --chart-3: #F2E8C4;
+  --chart-4: #888888;
+  --chart-5: #B8960C;
+  
+  /* Sidebar */
+  --sidebar: #0A0A0A;
+  --sidebar-foreground: #F2F0E4;
+  --sidebar-primary: #D4AF37;
+  --sidebar-primary-foreground: #0A0A0A;
+  --sidebar-accent: #141414;
+  --sidebar-accent-foreground: #F2F0E4;
+  --sidebar-border: rgba(212, 175, 55, 0.2);
+  --sidebar-ring: #D4AF37;
+}
+
+/* Dark mode is default for Art Deco */
+.dark {
+  --background: #0A0A0A;
+  --foreground: #F2F0E4;
+  --card: #141414;
+  --card-foreground: #F2F0E4;
+  --popover: #141414;
+  --popover-foreground: #F2F0E4;
+  --primary: #D4AF37;
+  --primary-foreground: #0A0A0A;
+  --secondary: #1E3D59;
+  --secondary-foreground: #F2F0E4;
+  --muted: #1A1A1A;
+  --muted-foreground: #888888;
+  --accent: #D4AF37;
+  --accent-foreground: #0A0A0A;
+  --destructive: #DC3545;
+  --border: rgba(212, 175, 55, 0.3);
+  --input: rgba(212, 175, 55, 0.2);
+  --ring: #D4AF37;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Josefin Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Marcellus', serif;
+    @apply uppercase tracking-widest;
+  }
+}
+
+/* Art Deco Utility Classes */
+@layer utilities {
+  /* Diagonal Crosshatch Pattern */
+  .art-deco-pattern {
+    background-image: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(212, 175, 55, 0.03) 10px,
+        rgba(212, 175, 55, 0.03) 11px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        rgba(212, 175, 55, 0.03) 10px,
+        rgba(212, 175, 55, 0.03) 11px
+      );
+  }
+  
+  /* Gold Glow Effect */
+  .gold-glow {
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+  }
+  
+  .gold-glow-intense {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+  }
+  
+  /* Gold Text Glow */
+  .text-glow {
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  }
+  
+  /* Sunburst Radial Gradient */
+  .sunburst {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(212, 175, 55, 0.15) 0%,
+      transparent 70%
+    );
+  }
+  
+  /* Double Border Effect */
+  .double-border {
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 
+      inset 0 0 0 3px #0A0A0A,
+      inset 0 0 0 4px rgba(212, 175, 55, 0.2);
+  }
+  
+  /* Stepped Corner Decoration */
+  .stepped-corners {
+    position: relative;
+  }
+  
+  .stepped-corners::before,
+  .stepped-corners::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(212, 175, 55, 0.5);
+  }
+  
+  .stepped-corners::before {
+    top: -4px;
+    left: -4px;
+    border-right: none;
+    border-bottom: none;
+  }
+  
+  .stepped-corners::after {
+    bottom: -4px;
+    right: -4px;
+    border-left: none;
+    border-top: none;
+  }
+  
+  /* Rotated Diamond Container */
+  .diamond-container {
+    transform: rotate(45deg);
+  }
+  
+  .diamond-content {
+    transform: rotate(-45deg);
+  }
+  
+  /* Corner Bracket Decorations */
+  .corner-brackets {
+    position: relative;
+  }
+  
+  .corner-brackets::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 16px;
+    height: 16px;
+    border-top: 2px solid rgba(212, 175, 55, 0.5);
+    border-right: 2px solid rgba(212, 175, 55, 0.5);
+  }
+  
+  .corner-brackets::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    width: 16px;
+    height: 16px;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.5);
+    border-left: 2px solid rgba(212, 175, 55, 0.5);
+  }
+  
+  /* Film Grain Overlay */
+  .grain-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* Art Deco Divider */
+  .art-deco-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .art-deco-divider::before,
+  .art-deco-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(212, 175, 55, 0.5) 50%,
+      transparent
+    );
+  }
+  
+  /* Vertical Divider */
+  .vertical-divider {
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    background: rgba(212, 175, 55, 0.2);
+  }
+  
+  /* Metallic Gradient for Buttons */
+  .metallic-gold {
+    background: linear-gradient(
+      135deg,
+      #F2E8C4 0%,
+      #D4AF37 25%,
+      #B8960C 50%,
+      #D4AF37 75%,
+      #F2E8C4 100%
+    );
+    background-size: 200% 200%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  /* Page Load Animation */
+  .page-enter {
+    animation: pageEnter 0.6s ease-out forwards;
+  }
+  
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Stagger Animation for Children */
+  .stagger-children > * {
+    animation: staggerIn 0.5s ease-out forwards;
+    opacity: 0;
+  }
+  
+  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+  .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+  
+  @keyframes staggerIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Art Deco Underline */
+  .art-deco-underline {
+    position: relative;
+  }
+  
+  .art-deco-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #D4AF37;
+    transform: scaleX(0);
+    transition: transform 0.3s ease-out;
+  }
+  
+  .art-deco-underline:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Custom Scrollbar for Art Deco Theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
+
+/* Selection Color */
+::selection {
+  background: rgba(212, 175, 55, 0.3);
+  color: #F2F0E4;
+}
+
+/* Code Editor Specific Styles */
+.code-editor-container {
+  background: linear-gradient(135deg, #0A0A0A 0%, #0F0F0F 100%);
+}
+
+.code-editor-textarea {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  line-height: 1.5;
+  tab-size: 2;
+  -moz-tab-size: 2;
+}
+
+.code-editor-textarea:focus {
+  outline: none;
+}
+
+/* Syntax Highlighting Placeholder (for future enhancement) */
+.code-line {
+  min-height: 1.5rem;
+}
+
+.code-keyword {
+  color: #D4AF37;
+}
+
+.code-string {
+  color: #F2E8C4;
+}
+
+.code-comment {
+  color: #888888;
+  font-style: italic;
+}
+
+.code-tag {
+  color: #1E3D59;
+}
+
+/* Art Deco Toast Styling */
+.art-deco-toast {
+  box-shadow: 
+    0 0 0 1px rgba(212, 175, 55, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.art-deco-toast[data-type="success"] {
+  border-color: rgba(212, 175, 55, 0.5) !important;
+}
+
+.art-deco-toast[data-type="success"]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #D4AF37;
+}
+
+.art-deco-toast[data-type="error"] {
+  border-color: rgba(220, 53, 69, 0.5) !important;
+}
+
+.art-deco-toast[data-type="error"]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #DC3545;
+}
+
+.art-deco-toast[data-type="info"] {
+  border-color: rgba(30, 61, 89, 0.5) !important;
+}
+
+.art-deco-toast[data-type="info"]::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #1E3D59;
+}
+

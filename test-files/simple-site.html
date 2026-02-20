@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test Site</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Welcome to SitePlod!</h1>
+        <p>This is a simple test site to verify that SitePlod is working correctly.</p>
+        <p>If you can see this page, it means:</p>
+        <ul>
+            <li>✅ File upload is working</li>
+            <li>✅ Site creation is working</li>
+            <li>✅ Site serving is working</li>
+            <li>✅ Your deployment is successful!</li>
+        </ul>
+        <a href="#" class="button">Learn More</a>
+    </div>
+    
+    <script>
+        console.log('SitePlod test site loaded successfully!');
+        document.querySelector('.button').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('SitePlod is working perfectly! 🎉');
+        });
+    </script>
+</body>
+</html>

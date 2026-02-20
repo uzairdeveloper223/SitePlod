@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site with Image Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .image-container {
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .test-image {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        .info {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            line-height: 1.8;
+        }
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>🖼️ Image Upload Test</h1>
+        
+        <div class="image-container">
+            <img src="logo.png" alt="Test Logo" class="test-image" id="testImage">
+        </div>
+        
+        <div class="info">
+            <h2>Testing Image Upload to ImgBB</h2>
+            <p>This page tests the image upload functionality:</p>
+            <div style="margin: 20px 0;">
+                <span class="badge">Image Detection</span>
+                <span class="badge">ImgBB Upload</span>
+                <span class="badge">URL Replacement</span>
+            </div>
+            <p>If you see an image above (or a broken image icon), the system is processing images correctly.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Check if image loaded successfully
+        const img = document.getElementById('testImage');
+        img.addEventListener('load', function() {
+            console.log('✅ Image loaded successfully from:', this.src);
+        });
+        img.addEventListener('error', function() {
+            console.log('⚠️ Image failed to load. This is expected if logo.png is not uploaded.');
+            this.style.display = 'none';
+            const container = this.parentElement;
+            container.innerHTML = '<p style="color: #ff6b6b;">📦 Image would be uploaded to ImgBB in production</p>';
+        });
+    </script>
+</body>
+</html>

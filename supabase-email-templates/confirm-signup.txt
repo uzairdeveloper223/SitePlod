@@ -1,0 +1,37 @@
+SITEPLOD
+Deploy Static Sites Instantly
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+VERIFY YOUR EMAIL
+
+Welcome to SitePlod!
+
+You're just one step away from deploying your static sites instantly. Please verify your email address to activate your account.
+
+Verify your email by clicking this link:
+{{ .ConfirmationURL }}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT HAPPENS NEXT?
+
+Once verified, you'll be able to:
+• Deploy unlimited static sites
+• Edit your sites with our live editor
+• Track analytics and views
+• Manage all your sites from one dashboard
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECURITY NOTE
+This verification link will expire in 24 hours. If you didn't create an account with SitePlod, you can safely ignore this email.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SitePlod - Deploy Static Sites Instantly
+Created by Uzair Mughal (@uzairdeveloper223)
+uzair.is-a.dev | contact@uzair.is-a.dev
+
+Privacy Policy: siteplod.vercel.app/privacy
+Terms of Service: siteplod.vercel.app/terms
