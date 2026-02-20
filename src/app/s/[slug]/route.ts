@@ -49,9 +49,9 @@ export async function GET(
     if (fetchUrl.includes('pastebin.com/') && !fetchUrl.includes('/raw/')) {
       fetchUrl = fetchUrl.replace('pastebin.com/', 'pastebin.com/raw/')
     }
-    
+
     console.log('Fetching content from:', fetchUrl)
-    
+
     // Retry logic for flaky networks
     let lastError: any
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -63,11 +63,11 @@ export async function GET(
           },
           validateStatus: (status) => status < 500,
         })
-        
+
         if (response.status >= 400) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`)
         }
-        
+
         content = typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
         console.log('Content fetched successfully, length:', content.length)
         break
@@ -79,7 +79,7 @@ export async function GET(
         }
       }
     }
-    
+
     if (!content) {
       throw lastError || new Error('Failed to fetch content after retries')
     }
@@ -93,8 +93,21 @@ export async function GET(
     console.error('Failed to track view:', err)
   })
 
+  // Inject <base> tag to correctly resolve relative asset paths (like css/style.css)
+  // because Next.js strips the slug in /s/[slug] when parsing relative URLs
+  const baseTag = `<base href="/s/${slug}/">\n`
+  let finalContent = content
+  if (finalContent.match(/<head[^>]*>/i)) {
+    finalContent = finalContent.replace(/(<head[^>]*>)/i, `$1\n  ${baseTag}`)
+  } else if (finalContent.match(/<html[^>]*>/i)) {
+    finalContent = finalContent.replace(/(<html[^>]*>)/i, `$1\n<head>\n  ${baseTag}</head>\n`)
+  } else {
+    // If no HTML boilerplate exists
+    finalContent = `<head>\n  ${baseTag}</head>\n` + finalContent
+  }
+
   // Return raw HTML
-  return new NextResponse(content, {
+  return new NextResponse(finalContent, {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'public, max-age=3600',
