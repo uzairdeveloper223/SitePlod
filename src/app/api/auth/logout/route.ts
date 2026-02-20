@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Logged out successfully'
     })
+    
   } catch (error) {
     // Handle authentication errors
     if (error instanceof AuthError) {

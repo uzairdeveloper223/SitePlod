@@ -150,10 +150,22 @@ export function Header({ currentPage = 'home', onNavigate }: HeaderProps) {
                   if (currentPage !== 'home') {
                     handleNavigate('home')
                     setTimeout(() => {
-                      document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' })
+                      const element = document.querySelector('#features')
+                      if (element) {
+                        const headerOffset = 80
+                        const elementPosition = element.getBoundingClientRect().top
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                        window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                      }
                     }, 100)
                   } else {
-                    document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' })
+                    const element = document.querySelector('#features')
+                    if (element) {
+                      const headerOffset = 80
+                      const elementPosition = element.getBoundingClientRect().top
+                      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                      window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                    }
                   }
                 }}
                 className="text-sm uppercase tracking-widest text-champagne/70 hover:text-gold transition-colors duration-300 art-deco-underline"
@@ -165,10 +177,22 @@ export function Header({ currentPage = 'home', onNavigate }: HeaderProps) {
                   if (currentPage !== 'home') {
                     handleNavigate('home')
                     setTimeout(() => {
-                      document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' })
+                      const element = document.querySelector('#pricing')
+                      if (element) {
+                        const headerOffset = 80
+                        const elementPosition = element.getBoundingClientRect().top
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                        window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                      }
                     }, 100)
                   } else {
-                    document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' })
+                    const element = document.querySelector('#pricing')
+                    if (element) {
+                      const headerOffset = 80
+                      const elementPosition = element.getBoundingClientRect().top
+                      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                      window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                    }
                   }
                 }}
                 className="text-sm uppercase tracking-widest text-champagne/70 hover:text-gold transition-colors duration-300 art-deco-underline"
@@ -287,10 +311,22 @@ export function Header({ currentPage = 'home', onNavigate }: HeaderProps) {
                 if (currentPage !== 'home') {
                   handleNavigate('home')
                   setTimeout(() => {
-                    document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' })
+                    const element = document.querySelector('#features')
+                    if (element) {
+                      const headerOffset = 80
+                      const elementPosition = element.getBoundingClientRect().top
+                      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                      window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                    }
                   }, 100)
                 } else {
-                  document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth' })
+                  const element = document.querySelector('#features')
+                  if (element) {
+                    const headerOffset = 80
+                    const elementPosition = element.getBoundingClientRect().top
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                  }
                 }
               }}
               className="text-left text-sm uppercase tracking-widest text-champagne/70 py-2 border-b border-gold/10"
@@ -303,10 +339,22 @@ export function Header({ currentPage = 'home', onNavigate }: HeaderProps) {
                 if (currentPage !== 'home') {
                   handleNavigate('home')
                   setTimeout(() => {
-                    document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' })
+                    const element = document.querySelector('#pricing')
+                    if (element) {
+                      const headerOffset = 80
+                      const elementPosition = element.getBoundingClientRect().top
+                      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                      window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                    }
                   }, 100)
                 } else {
-                  document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' })
+                  const element = document.querySelector('#pricing')
+                  if (element) {
+                    const headerOffset = 80
+                    const elementPosition = element.getBoundingClientRect().top
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+                  }
                 }
               }}
               className="text-left text-sm uppercase tracking-widest text-champagne/70 py-2 border-b border-gold/10"

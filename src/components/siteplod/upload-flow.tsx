@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { validateEmail, validatePassword, validateSlug, type PasswordValidation } from '@/lib/validation'
+import { validateSlug } from '@/lib/validation'
 import { MissingImagesDialog } from './missing-images-dialog'
 import { apiClient } from '@/lib/api-client'
 
@@ -29,23 +29,10 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
   const [slugError, setSlugError] = useState<string | null>(null)
   const [isCheckingSlug, setIsCheckingSlug] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
-  const [registerDialogOpen, setRegisterDialogOpen] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
   const [deploymentProgress, setDeploymentProgress] = useState(0)
   const [deploymentStatus, setDeploymentStatus] = useState('')
-  const [isRegisterLoading, setIsRegisterLoading] = useState(false)
-
-  // Email validation state
-  const [registerEmail, setRegisterEmail] = useState('')
-  const [registerEmailError, setRegisterEmailError] = useState<string | null>(null)
-
-  // Password validation state
-  const [registerPassword, setRegisterPassword] = useState('')
-  const [registerPasswordValidation, setRegisterPasswordValidation] = useState<PasswordValidation | null>(null)
-
-  // Username state
-  const [registerUsername, setRegisterUsername] = useState('')
 
   // Missing images state
   const [missingImages, setMissingImages] = useState<string[]>([])
@@ -162,8 +149,22 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
         })
         setCurrentStep('slug')
       } else {
-        // User not logged in, show registration dialog
-        setRegisterDialogOpen(true)
+        // User not logged in, prompt them to register using the header
+        toast.error('Account required', {
+          description: 'Please register or login using the button in the header to continue with managed deployment.',
+          duration: 8000,
+          action: {
+            label: 'Open Login',
+            onClick: () => {
+              const loginButton = document.querySelector('[data-login-button]') as HTMLElement
+              if (loginButton) {
+                loginButton.click()
+              }
+            }
+          }
+        })
+        // Reset to choice step
+        setCurrentStep('choice')
       }
     } else {
       setCurrentStep('slug')
@@ -207,8 +208,20 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
       // Check if user is logged in
       const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
       if (!token) {
-        // User not logged in, show registration dialog
-        setRegisterDialogOpen(true)
+        // User not logged in, prompt them to register using the header
+        toast.error('Account required', {
+          description: 'Please register or login using the button in the header to continue.',
+          duration: 8000,
+          action: {
+            label: 'Open Login',
+            onClick: () => {
+              const loginButton = document.querySelector('[data-login-button]') as HTMLElement
+              if (loginButton) {
+                loginButton.click()
+              }
+            }
+          }
+        })
         return
       }
       // User is logged in, proceed with deployment
@@ -267,85 +280,17 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
     }
   }
 
-  const handleRegister = async () => {
-    // Prevent double submission
-    if (isRegisterLoading) return
-
-    // Validate all fields
-    if (!registerUsername || !registerEmail || !registerPassword) {
-      toast.error('All fields required', {
-        description: 'Please fill in all registration fields'
-      })
-      return
+  const handleBack = () => {
+    switch (currentStep) {
+      case 'choice':
+        setCurrentStep('upload')
+        break
+      case 'slug':
+        setCurrentStep('choice')
+        break
+      default:
+        setCurrentStep('upload')
     }
-
-    if (registerEmailError) {
-      toast.error('Invalid email', {
-        description: 'Please enter a valid email address'
-      })
-      return
-    }
-
-    if (registerPasswordValidation?.error) {
-      toast.error('Invalid password', {
-        description: 'Please meet all password requirements'
-      })
-      return
-    }
-
-    setIsRegisterLoading(true)
-
-    try {
-      const response = await apiClient.register({
-        username: registerUsername,
-        email: registerEmail,
-        password: registerPassword
-      })
-
-      toast.success('Account created successfully!', {
-        description: 'You can now manage your sites'
-      })
-
-      // Dispatch event for other components
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('auth-state-changed'))
-      }
-
-      setRegisterDialogOpen(false)
-      resetRegisterForm()
-      setCurrentStep('slug')
-    } catch (error: any) {
-      console.error('Registration error:', error)
-      toast.error('Registration failed', {
-        description: error.message || 'Please try again or contact support'
-      })
-    } finally {
-      setIsRegisterLoading(false)
-    }
-  }
-
-  const handleRegisterEmailChange = (value: string) => {
-    setRegisterEmail(value)
-
-    // Real-time validation
-    const validation = validateEmail(value)
-    setRegisterEmailError(validation.valid ? null : validation.error || null)
-  }
-
-  const handleRegisterPasswordChange = (value: string) => {
-    setRegisterPassword(value)
-
-    // Real-time validation
-    const validation = validatePassword(value)
-    setRegisterPasswordValidation(validation)
-  }
-
-  const resetRegisterForm = () => {
-    setRegisterUsername('')
-    setRegisterEmail('')
-    setRegisterEmailError(null)
-    setRegisterPassword('')
-    setRegisterPasswordValidation(null)
   }
 
   const handleImagesUploaded = async (imageMap: Record<string, string>) => {
@@ -396,23 +341,6 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
         description: 'Please try uploading again'
       })
       setCurrentStep('upload')
-    }
-  }
-
-  const handleBack = () => {
-    switch (currentStep) {
-      case 'choice':
-        setCurrentStep('upload')
-        break
-      case 'slug':
-        if (isManaged) {
-          setRegisterDialogOpen(true)
-        } else {
-          setCurrentStep('choice')
-        }
-        break
-      default:
-        setCurrentStep('upload')
     }
   }
 
@@ -901,160 +829,6 @@ export function UploadFlow({ onNavigate }: UploadFlowProps) {
           </Card>
         )}
       </div>
-
-      {/* Registration Dialog */}
-      <Dialog open={registerDialogOpen} onOpenChange={setRegisterDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create Your Account</DialogTitle>
-            <DialogDescription>
-              Register to manage your sites with full dashboard access.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form className="space-y-6 pt-4" onSubmit={async (e) => {
-            e.preventDefault()
-            await handleRegister()
-          }}>
-            <div className="space-y-2">
-              <Label htmlFor="reg-username">Username</Label>
-              <Input
-                id="reg-username"
-                placeholder="johndoe"
-                value={registerUsername}
-                onChange={(e) => setRegisterUsername(e.target.value)}
-                required
-                disabled={isRegisterLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="reg-email">Email</Label>
-              <Input
-                id="reg-email"
-                type="email"
-                placeholder="you@example.com"
-                value={registerEmail}
-                onChange={(e) => handleRegisterEmailChange(e.target.value)}
-                required
-                disabled={isRegisterLoading}
-                className={registerEmailError ? 'border-red-500' : !registerEmailError && registerEmail ? 'border-green-500' : ''}
-              />
-              {registerEmailError && (
-                <p className="text-sm text-red-400">{registerEmailError}</p>
-              )}
-              {!registerEmailError && registerEmail && (
-                <p className="text-sm text-green-400 flex items-center gap-1">
-                  <Check className="w-4 h-4" /> Valid email
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="reg-password">Password</Label>
-              <Input
-                id="reg-password"
-                type="password"
-                placeholder="••••••••"
-                value={registerPassword}
-                onChange={(e) => handleRegisterPasswordChange(e.target.value)}
-                required
-                disabled={isRegisterLoading}
-                className={registerPasswordValidation?.error ? 'border-red-500' : !registerPasswordValidation?.error && registerPassword ? 'border-green-500' : ''}
-              />
-              {registerPasswordValidation?.error && (
-                <p className="text-sm text-red-400">{registerPasswordValidation.error}</p>
-              )}
-              {registerPassword && registerPasswordValidation && (
-                <div className="space-y-2">
-                  {/* Strength indicator */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-obsidian border border-gold/30 overflow-hidden">
-                      <div
-                        className={cn(
-                          'h-full transition-all duration-300',
-                          registerPasswordValidation.strength === 'weak' && 'w-1/4 bg-red-500',
-                          registerPasswordValidation.strength === 'fair' && 'w-2/4 bg-yellow-500',
-                          registerPasswordValidation.strength === 'good' && 'w-3/4 bg-blue-500',
-                          registerPasswordValidation.strength === 'strong' && 'w-full bg-green-500'
-                        )}
-                      />
-                    </div>
-                    <span className={cn(
-                      'text-xs uppercase tracking-wide',
-                      registerPasswordValidation.strength === 'weak' && 'text-red-400',
-                      registerPasswordValidation.strength === 'fair' && 'text-yellow-400',
-                      registerPasswordValidation.strength === 'good' && 'text-blue-400',
-                      registerPasswordValidation.strength === 'strong' && 'text-green-400'
-                    )}>
-                      {registerPasswordValidation.strength}
-                    </span>
-                  </div>
-
-                  {/* Requirements list */}
-                  <div className="text-xs space-y-1">
-                    <div className={cn(
-                      'flex items-center gap-1',
-                      registerPasswordValidation.requirements.minLength ? 'text-green-400' : 'text-pewter'
-                    )}>
-                      {registerPasswordValidation.requirements.minLength ? <Check className="w-3 h-3" /> : <span className="w-3 h-3 border border-current rounded-full" />}
-                      <span>At least 8 characters</span>
-                    </div>
-                    <div className={cn(
-                      'flex items-center gap-1',
-                      registerPasswordValidation.requirements.hasUppercase ? 'text-green-400' : 'text-pewter'
-                    )}>
-                      {registerPasswordValidation.requirements.hasUppercase ? <Check className="w-3 h-3" /> : <span className="w-3 h-3 border border-current rounded-full" />}
-                      <span>One uppercase letter</span>
-                    </div>
-                    <div className={cn(
-                      'flex items-center gap-1',
-                      registerPasswordValidation.requirements.hasLowercase ? 'text-green-400' : 'text-pewter'
-                    )}>
-                      {registerPasswordValidation.requirements.hasLowercase ? <Check className="w-3 h-3" /> : <span className="w-3 h-3 border border-current rounded-full" />}
-                      <span>One lowercase letter</span>
-                    </div>
-                    <div className={cn(
-                      'flex items-center gap-1',
-                      registerPasswordValidation.requirements.hasNumber ? 'text-green-400' : 'text-pewter'
-                    )}>
-                      {registerPasswordValidation.requirements.hasNumber ? <Check className="w-3 h-3" /> : <span className="w-3 h-3 border border-current rounded-full" />}
-                      <span>One number</span>
-                    </div>
-                    <div className={cn(
-                      'flex items-center gap-1',
-                      registerPasswordValidation.requirements.hasSpecial ? 'text-green-400' : 'text-pewter'
-                    )}>
-                      {registerPasswordValidation.requirements.hasSpecial ? <Check className="w-3 h-3" /> : <span className="w-3 h-3 border border-current rounded-full" />}
-                      <span>One special character</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <Button type="submit" className="w-full" disabled={isRegisterLoading}>
-                {isRegisterLoading ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating Account...</>
-                ) : (
-                  'Create Account & Continue'
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setRegisterDialogOpen(false)
-                  setIsManaged(false)
-                  setCurrentStep('slug')
-                }}
-                disabled={isRegisterLoading}
-              >
-                Skip & Deploy Without Account
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
 
       {/* Missing Images Dialog */}
       <MissingImagesDialog
