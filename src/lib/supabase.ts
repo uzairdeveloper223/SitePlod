@@ -22,6 +22,8 @@ export interface Database {
           id: string
           username: string
           email: string
+          notification: string[]
+          cli_announced: boolean
           created_at: string
           updated_at: string
         }
@@ -29,6 +31,8 @@ export interface Database {
           id: string
           username: string
           email: string
+          notification?: string[]
+          cli_announced?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -36,6 +40,8 @@ export interface Database {
           id?: string
           username?: string
           email?: string
+          notification?: string[]
+          cli_announced?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -141,15 +147,15 @@ export function getAdminClient(): SupabaseClient<Database> {
   if (!adminClient) {
     try {
       const env = getEnv()
-      
+
       if (!env.SUPABASE_URL) {
         throw new Error('SUPABASE_URL is not configured')
       }
-      
+
       if (!env.SUPABASE_SERVICE_KEY) {
         throw new Error('SUPABASE_SERVICE_KEY is not configured')
       }
-      
+
       adminClient = createClient<Database>(
         env.SUPABASE_URL,
         env.SUPABASE_SERVICE_KEY,
@@ -165,7 +171,7 @@ export function getAdminClient(): SupabaseClient<Database> {
       throw new Error(`Failed to initialize Supabase admin client: ${message}`)
     }
   }
-  
+
   return adminClient
 }
 
@@ -179,15 +185,15 @@ export function getAnonClient(): SupabaseClient<Database> {
   if (!anonClient) {
     try {
       const env = getEnv()
-      
+
       if (!env.SUPABASE_URL) {
         throw new Error('SUPABASE_URL is not configured')
       }
-      
+
       if (!env.SUPABASE_ANON_KEY) {
         throw new Error('SUPABASE_ANON_KEY is not configured')
       }
-      
+
       anonClient = createClient<Database>(
         env.SUPABASE_URL,
         env.SUPABASE_ANON_KEY,
@@ -203,7 +209,7 @@ export function getAnonClient(): SupabaseClient<Database> {
       throw new Error(`Failed to initialize Supabase anon client: ${message}`)
     }
   }
-  
+
   return anonClient
 }
 
@@ -215,15 +221,15 @@ export function getAnonClient(): SupabaseClient<Database> {
 export function getServerClient(): SupabaseClient<Database> {
   try {
     const env = getEnv()
-    
+
     if (!env.SUPABASE_URL) {
       throw new Error('SUPABASE_URL is not configured')
     }
-    
+
     if (!env.SUPABASE_ANON_KEY) {
       throw new Error('SUPABASE_ANON_KEY is not configured')
     }
-    
+
     return createClient<Database>(
       env.SUPABASE_URL,
       env.SUPABASE_ANON_KEY,
@@ -248,15 +254,15 @@ export function getServerClient(): SupabaseClient<Database> {
 export function createAuthClient(accessToken: string): SupabaseClient<Database> {
   try {
     const env = getEnv()
-    
+
     if (!env.SUPABASE_URL) {
       throw new Error('SUPABASE_URL is not configured')
     }
-    
+
     if (!env.SUPABASE_ANON_KEY) {
       throw new Error('SUPABASE_ANON_KEY is not configured')
     }
-    
+
     return createClient<Database>(
       env.SUPABASE_URL,
       env.SUPABASE_ANON_KEY,

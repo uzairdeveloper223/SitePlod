@@ -1,10 +1,83 @@
 'use client'
 
-import { Terminal, Bell, ArrowRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Terminal, Bell, ArrowRight, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Section, SectionTitle } from '@/components/siteplod/page-wrapper'
+import { apiClient } from '@/lib/api-client'
+import { toast } from 'sonner'
 
 export function CLIAnnouncement() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
+
+  useEffect(() => {
+    // Check if user is already logged in on mount
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+    if (token) {
+      setIsLoggedIn(true)
+      checkSubscriptionStatus()
+    }
+
+    // Listen for auth state changes
+    const handleAuthChange = () => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+      setIsLoggedIn(!!token)
+      if (token) checkSubscriptionStatus()
+      else setIsSubscribed(false)
+    }
+
+    window.addEventListener('auth-state-changed', handleAuthChange)
+    return () => window.removeEventListener('auth-state-changed', handleAuthChange)
+  }, [])
+
+  const checkSubscriptionStatus = async () => {
+    try {
+      const profile = await apiClient.getProfile()
+      if (profile.notification?.includes('CLI_ANNOUNCEMENT') || profile.cli_announced) {
+        setIsSubscribed(true)
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile', error)
+    }
+  }
+
+  const handleGetNotified = async () => {
+    if (!isLoggedIn) {
+      document.querySelector<HTMLElement>('[data-login-button]')?.click()
+      return
+    }
+
+    if (isSubscribed) {
+      toast.info('Already subscribed!', {
+        description: 'You are on the list for the CLI release.'
+      })
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const resp = await apiClient.subscribeCliNotification()
+      setIsSubscribed(true)
+
+      if (resp.alreadySubscribed) {
+        toast.info('Already subscribed!', {
+          description: 'You are already on the list for the CLI release.'
+        })
+      } else {
+        toast.success('Subscribed!', {
+          description: 'You will be notified when the CLI is released.'
+        })
+      }
+    } catch (error: any) {
+      toast.error('Subscription failed', {
+        description: error.message || 'Please try again later'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
   return (
     <Section id="cli" variant="alternate">
       <div className="max-w-4xl mx-auto">
@@ -64,12 +137,17 @@ export function CLIAnnouncement() {
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-                <Button variant="solid" className="group">
-                  Get Notified
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <Button variant="ghost">
-                  View Documentation
+                <Button variant="solid" className="group" onClick={handleGetNotified} disabled={isLoading || isSubscribed}>
+                  {isLoading ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Subscribing...</>
+                  ) : isSubscribed ? (
+                    'Already Notified / Subscribed!'
+                  ) : (
+                    <>
+                      Get Notified
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

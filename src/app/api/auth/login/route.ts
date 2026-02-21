@@ -37,7 +37,7 @@ async function loginHandler(request: NextRequest) {
     // Parse and validate request body
     const body = await request.json()
     const validationResult = loginSchema.safeParse(body)
-    
+
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]
       return NextResponse.json(
@@ -49,18 +49,18 @@ async function loginHandler(request: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     const { email, password } = validationResult.data
-    
+
     // Get server client for authentication
     const supabase = getServerClient()
-    
+
     // Authenticate with Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password
     })
-    
+
     // Check for email not confirmed error specifically
     if (authError && authError.message === 'Email not confirmed') {
       console.log('User email not confirmed:', email)
@@ -74,7 +74,7 @@ async function loginHandler(request: NextRequest) {
         { status: 403 }
       )
     }
-    
+
     if (authError || !authData.user || !authData.session) {
       console.error('Auth error:', authError)
       return NextResponse.json(
@@ -86,7 +86,7 @@ async function loginHandler(request: NextRequest) {
         { status: 401 }
       )
     }
-    
+
     // Check if email is verified (backup check)
     if (!authData.user.email_confirmed_at) {
       console.log('User email not verified:', authData.user.id)
@@ -100,17 +100,17 @@ async function loginHandler(request: NextRequest) {
         { status: 403 }
       )
     }
-    
+
     // Fetch user data from database using admin client
     const adminClient = getAdminClient() as any
-    
+
     // Try to find user by ID first
     let { data: userData, error: dbError } = await adminClient
       .from('users')
       .select('*')
       .eq('id', authData.user.id)
       .single()
-    
+
     // If user doesn't exist by ID, try to find by email (in case of ID mismatch)
     if (dbError && authData.user.email) {
       console.log('User not found by ID, trying by email:', authData.user.email)
@@ -119,10 +119,10 @@ async function loginHandler(request: NextRequest) {
         .select('*')
         .eq('email', authData.user.email)
         .single()
-      
+
       if (!emailError && userByEmail) {
         console.log('Found user by email, updating ID:', userByEmail.id, '->', authData.user.id)
-        
+
         // Update the user record with the correct auth ID
         const { data: updatedUser, error: updateError } = await adminClient
           .from('users')
@@ -130,20 +130,20 @@ async function loginHandler(request: NextRequest) {
           .eq('email', authData.user.email)
           .select()
           .single()
-        
+
         if (!updateError && updatedUser) {
           userData = updatedUser
           dbError = null
         }
       }
     }
-    
+
     // If user still doesn't exist in database, create it now (edge case)
     if (dbError || !userData) {
       console.log('User not found in database, creating record:', authData.user.id)
-      
+
       const username = authData.user.user_metadata?.username || authData.user.email?.split('@')[0]
-      
+
       const { data: newUserData, error: insertError } = await adminClient
         .from('users')
         .insert({
@@ -153,15 +153,15 @@ async function loginHandler(request: NextRequest) {
         })
         .select()
         .single()
-      
+
       if (insertError) {
         console.error('Failed to create user record:', insertError)
-        
+
         // If it's a duplicate username error, try with a unique username
         if (insertError.code === '23505' && insertError.message.includes('username')) {
           console.log('Username conflict, trying with unique username')
           const uniqueUsername = `${username}_${authData.user.id.substring(0, 8)}`
-          
+
           const { data: retryUserData, error: retryError } = await adminClient
             .from('users')
             .insert({
@@ -171,7 +171,7 @@ async function loginHandler(request: NextRequest) {
             })
             .select()
             .single()
-          
+
           if (retryError || !retryUserData) {
             console.error('Failed to create user record with unique username:', retryError)
             return NextResponse.json(
@@ -183,19 +183,21 @@ async function loginHandler(request: NextRequest) {
               { status: 500 }
             )
           }
-          
+
           // Use the newly created user data
           return NextResponse.json({
             user: {
               id: retryUserData.id,
               username: retryUserData.username,
               email: retryUserData.email,
+              notification: retryUserData.notification,
+              cli_announced: retryUserData.cli_announced,
               createdAt: retryUserData.created_at
             },
             token: authData.session.access_token
           })
         }
-        
+
         return NextResponse.json(
           {
             error: 'Database error',
@@ -205,7 +207,7 @@ async function loginHandler(request: NextRequest) {
           { status: 500 }
         )
       }
-      
+
       if (!newUserData) {
         return NextResponse.json(
           {
@@ -216,48 +218,61 @@ async function loginHandler(request: NextRequest) {
           { status: 500 }
         )
       }
-      
+
       // Use the newly created user data
       return NextResponse.json({
         user: {
           id: newUserData.id,
           username: newUserData.username,
           email: newUserData.email,
+          notification: newUserData.notification,
+          cli_announced: newUserData.cli_announced,
           createdAt: newUserData.created_at
         },
         token: authData.session.access_token
       })
     }
-    
+
     // Send welcome email if not sent yet (non-blocking)
     if (!userData.welcome_email_sent && authData.user.email) {
       console.log('Sending welcome email on first login:', authData.user.email)
       sendWelcomeEmail(authData.user.email, userData.username).then(() => {
-        // Mark welcome email as sent
+        // Prepare notification array
+        const currentNotifications = userData.notification || []
+        const notification = currentNotifications.includes('CLI_ANNOUNCEMENT') || userData.cli_announced
+          ? currentNotifications
+          : [...currentNotifications, 'CLI_ANNOUNCEMENT']
+
+        // Mark welcome email as sent and subscribe to CLI
         adminClient
           .from('users')
-          .update({ welcome_email_sent: true })
+          .update({
+            welcome_email_sent: true,
+            notification
+          })
           .eq('id', userData.id)
-          .then(() => console.log('Welcome email sent and marked'))
-          .catch((err: any) => console.error('Failed to mark welcome email as sent:', err))
+          .then(() => console.log('Welcome email sent and marked, CLI notification subscribed'))
+          .catch((err: any) => console.error('Failed to update first login fields:', err))
       }).catch((error: any) => {
         console.error('Failed to send welcome email:', error)
       })
     }
-    
+
     // Return user data and JWT token
     return NextResponse.json({
       user: {
         id: userData.id,
         username: userData.username,
         email: userData.email,
+        notification: userData.notification,
+        cli_announced: userData.cli_announced,
         createdAt: userData.created_at
       },
       token: authData.session.access_token
     })
   } catch (error) {
     console.error('Login error:', error)
-    
+
     // Handle JSON parse errors
     if (error instanceof SyntaxError) {
       return NextResponse.json(
@@ -269,7 +284,7 @@ async function loginHandler(request: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     // Handle unexpected errors
     return NextResponse.json(
       {

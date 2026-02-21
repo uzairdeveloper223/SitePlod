@@ -13,6 +13,8 @@ export interface User {
   id: string
   username: string
   email: string
+  notification?: string[]
+  cli_announced?: boolean
   createdAt: string
   updatedAt: string
 }

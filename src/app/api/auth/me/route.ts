@@ -16,17 +16,17 @@ export async function GET(request: NextRequest) {
   try {
     // Verify JWT token and get user ID
     const userId = await requireAuth(request)
-    
+
     // Get admin client to fetch user data
     const supabase = getAdminClient() as any
-    
+
     // Fetch user data from database
     const { data: userData, error: dbError } = await supabase
       .from('users')
       .select('*')
       .eq('id', userId)
       .single()
-    
+
     if (dbError) {
       return NextResponse.json(
         {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       )
     }
-    
+
     if (!userData) {
       return NextResponse.json(
         {
@@ -48,13 +48,15 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       )
     }
-    
+
     // Return user data
     return NextResponse.json({
       user: {
         id: userData.id,
         username: userData.username,
         email: userData.email,
+        notification: userData.notification,
+        cli_announced: userData.cli_announced,
         createdAt: userData.created_at,
         updatedAt: userData.updated_at
       }
@@ -71,9 +73,9 @@ export async function GET(request: NextRequest) {
         { status: error.statusCode }
       )
     }
-    
+
     console.error('Get current user error:', error)
-    
+
     // Handle unexpected errors
     return NextResponse.json(
       {

@@ -228,7 +228,8 @@ class ApiClient {
    * Get the current user's profile
    */
   async getProfile(): Promise<User> {
-    return retryWithBackoff(() => this.request<User>('/auth/me'))
+    const response = await retryWithBackoff(() => this.request<{ user: User }>('/auth/me'))
+    return response.user
   }
 
   /**
@@ -239,6 +240,17 @@ class ApiClient {
       this.request<User>('/auth/profile', {
         method: 'PUT',
         body: JSON.stringify(data),
+      })
+    )
+  }
+
+  /**
+   * Subscribe to CLI announcements
+   */
+  async subscribeCliNotification(): Promise<{ success: boolean; message: string; alreadySubscribed?: boolean }> {
+    return retryWithBackoff(() =>
+      this.request<{ success: boolean; message: string; alreadySubscribed?: boolean }>('/auth/cli-notify', {
+        method: 'POST',
       })
     )
   }
@@ -273,7 +285,7 @@ class ApiClient {
    */
   async getSites(): Promise<Site[]> {
     const response = await retryWithBackoff(() => this.request<any[]>('/sites'))
-    
+
     // Transform database response to camelCase
     return response.map(site => ({
       id: site.id,
@@ -293,7 +305,7 @@ class ApiClient {
    */
   async getSite(id: string): Promise<Site> {
     const response = await retryWithBackoff(() => this.request<any>(`/sites/${id}`))
-    
+
     // Transform database response to camelCase
     return {
       id: response.id,
@@ -328,7 +340,7 @@ class ApiClient {
         body: JSON.stringify(data),
       })
     )
-    
+
     // Transform database response to camelCase
     return {
       id: response.id,
@@ -365,7 +377,7 @@ class ApiClient {
     const response = await retryWithBackoff(() =>
       this.request<any>(`/sites/${siteId}/files/${encodeURIComponent(path)}`)
     )
-    
+
     // Transform database response to camelCase
     return {
       id: response.id || '',
