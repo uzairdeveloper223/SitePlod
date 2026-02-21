@@ -12,12 +12,12 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Sunburst radial gradient background */}
       <div className="absolute inset-0 sunburst opacity-50" aria-hidden="true" />
-      
+
       {/* Floating geometric decorations */}
       <div className="absolute top-1/4 left-1/4 w-32 h-32 border border-gold/10 rotate-45 animate-pulse" aria-hidden="true" />
       <div className="absolute bottom-1/4 right-1/4 w-24 h-24 border border-gold/10 rotate-12" aria-hidden="true" />
       <div className="absolute top-1/3 right-1/3 w-16 h-16 border border-gold/5 rotate-45" aria-hidden="true" />
-      
+
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-charcoal border border-gold/30 mb-8 animate-fade-in">
@@ -26,7 +26,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             Free Static Site Hosting
           </span>
         </div>
-        
+
         {/* Main heading */}
         <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-champagne uppercase tracking-widest leading-tight mb-6 animate-slide-up">
           Deploy Your
@@ -35,13 +35,13 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
           <br />
           In Seconds
         </h1>
-        
+
         {/* Subtitle */}
         <p className="text-lg md:text-xl text-pewter max-w-2xl mx-auto leading-relaxed mb-12 animate-slide-up [animation-delay:200ms]">
           Upload your HTML, CSS, and JavaScript files. Get a live URL instantly.
           No backend required. No credit card needed. Just pure, elegant static hosting.
         </p>
-        
+
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up [animation-delay:400ms]">
           <Button
@@ -53,16 +53,8 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             <Upload className="w-5 h-5 mr-2 group-hover:animate-bounce" />
             Deploy Now
           </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="min-w-[200px] group"
-          >
-            View Features
-            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
         </div>
-        
+
         {/* Stats */}
         <div className="mt-20 grid grid-cols-3 gap-8 max-w-3xl mx-auto animate-fade-in [animation-delay:600ms]">
           <div className="text-center">
@@ -78,7 +70,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             <div className="text-xs uppercase tracking-widest text-pewter">Uptime</div>
           </div>
         </div>
-        
+
         {/* Bouncing scroll button */}
         <div className="mt-16 flex justify-center animate-fade-in [animation-delay:800ms]">
           <button
