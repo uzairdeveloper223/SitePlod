@@ -177,7 +177,7 @@ async function postHandler(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', message: error.errors[0].message, statusCode: 400 },
+        { error: 'Validation error', message: error.issues[0].message, statusCode: 400 },
         { status: 400 }
       )
     }
