@@ -4,13 +4,18 @@
  * POST /api/auth/register
  * 
  * Creates a new user account with Supabase Auth and sends email verification.
+ * Rate limited to 3 requests per hour per IP.
  * 
  * Requirements: 2
+ * Security: H2 (secure logging), M1 (email sanitization), M2 (rate limiting)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getAdminClient, getServerClient } from '@/lib/supabase'
+import { withRateLimit } from '@/lib/with-rate-limit'
+import { logger } from '@/lib/logger'
+import { sanitizeEmail } from '@/lib/validation'
 
 /**
  * Registration request schema
@@ -34,7 +39,7 @@ const registerSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
 })
 
-export async function POST(request: NextRequest) {
+async function registerHandler(request: NextRequest) {
   try {
     // Parse and validate request body
     const body = await request.json()
@@ -52,7 +57,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { username, email, password } = validationResult.data
+    const { username, password } = validationResult.data
+    const email = sanitizeEmail(validationResult.data.email)
 
     // Get admin client for privileged operations
     const supabase = getAdminClient() as any
@@ -94,7 +100,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (signUpError) {
-      console.error('Signup error:', signUpError)
+      logger.error('Signup error:', signUpError)
       // Handle specific auth errors
       if (signUpError.message.includes('already registered') || signUpError.message.includes('User already registered')) {
         return NextResponse.json(
@@ -118,7 +124,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!signUpData.user) {
-      console.error('No user returned from signup')
+      logger.error('No user returned from signup')
       return NextResponse.json(
         {
           error: 'Registration failed',
@@ -129,7 +135,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('User created:', signUpData.user.id, 'Email confirmed:', signUpData.user.email_confirmed_at)
+    logger.debug('User created, email confirmation pending')
 
     // Insert user record into database using admin client
     const { data: userData, error: dbError } = await supabase
@@ -144,7 +150,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (dbError) {
-      console.error('Database insert error:', dbError)
+      logger.error('Database insert error:', dbError)
       // User is created in auth but not in database
       // They can still verify and we'll handle it in the verify endpoint
       return NextResponse.json(
@@ -156,7 +162,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('User record created in database:', userData.id)
+    logger.debug('User record created in database')
 
     // Return success message
     return NextResponse.json(
@@ -172,7 +178,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('Registration error:', error)
+    logger.error('Registration error:', error)
 
     // Handle JSON parse errors
     if (error instanceof SyntaxError) {
@@ -197,3 +203,6 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+// Apply rate limiting: 3 requests per hour (M2)
+export const POST = withRateLimit(registerHandler, 'register')

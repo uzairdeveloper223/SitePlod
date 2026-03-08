@@ -5,11 +5,14 @@
  * 
  * Handles email verification callback from Supabase Auth.
  * Verifies the user's email and creates their database record if needed.
+ * 
+ * Security: H2 (secure logging)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerClient, getAdminClient } from '@/lib/supabase'
 import { sendWelcomeEmail } from '@/lib/email'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     // Check if there's an error from Supabase
     if (error) {
-      console.error('Supabase verification error:', error, error_description)
+      logger.error('Supabase verification error:', error, error_description)
       return NextResponse.redirect(
         new URL(`/?error=${error}`, request.url)
       )
@@ -30,7 +33,7 @@ export async function GET(request: NextRequest) {
     // If no token_hash or type, the verification likely already happened
     // Supabase redirects here after successful verification
     if (!token_hash || !type) {
-      console.log('No token parameters - verification likely already completed')
+      logger.info('No token parameters - verification likely already completed')
       // Just redirect to success since Supabase already verified the email
       // Note: Welcome email won't be sent in this case since we don't have user info
       return NextResponse.redirect(
@@ -46,20 +49,20 @@ export async function GET(request: NextRequest) {
     })
 
     if (verifyError) {
-      console.error('Email verification error:', verifyError)
+      logger.error('Email verification error:', verifyError)
       return NextResponse.redirect(
         new URL('/?error=verification_failed', request.url)
       )
     }
 
     if (!data.user) {
-      console.error('No user returned from verification')
+      logger.error('No user returned from verification')
       return NextResponse.redirect(
         new URL('/?error=verification_failed', request.url)
       )
     }
 
-    console.log('Email verified successfully:', data.user.id)
+    logger.info('Email verified successfully')
 
     // Check if user record exists in database
     const adminClient = getAdminClient() as any
@@ -82,7 +85,7 @@ export async function GET(request: NextRequest) {
         })
 
       if (insertError) {
-        console.error('Failed to create user record:', insertError)
+        logger.error('Failed to create user record:', insertError)
         // Continue anyway - user is verified in auth
       }
     }
@@ -90,9 +93,9 @@ export async function GET(request: NextRequest) {
     // Send welcome email (non-blocking)
     if (data.user.email) {
       const username = data.user.user_metadata?.username || data.user.email.split('@')[0]
-      console.log('Sending welcome email to:', data.user.email)
-      sendWelcomeEmail(data.user.email, username).catch(error => {
-        console.error('Failed to send welcome email:', error)
+      logger.debug('Sending welcome email')
+      sendWelcomeEmail(data.user.email, username).catch(err => {
+        logger.error('Failed to send welcome email:', err)
       })
     }
 
@@ -101,7 +104,7 @@ export async function GET(request: NextRequest) {
       new URL('/?verified=true', request.url)
     )
   } catch (error) {
-    console.error('Verification error:', error)
+    logger.error('Verification error:', error)
     return NextResponse.redirect(
       new URL('/?error=verification_failed', request.url)
     )

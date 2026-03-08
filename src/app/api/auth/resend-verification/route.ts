@@ -4,17 +4,23 @@
  * POST /api/auth/resend-verification
  * 
  * Resends the email verification link to the user.
+ * Rate limited to 2 requests per 5 minutes per IP.
+ * 
+ * Security: H2 (secure logging), M1 (email sanitization), M2 (rate limiting)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getServerClient } from '@/lib/supabase'
+import { withRateLimit } from '@/lib/with-rate-limit'
+import { logger } from '@/lib/logger'
+import { sanitizeEmail } from '@/lib/validation'
 
 const resendSchema = z.object({
   email: z.string().email('Invalid email format')
 })
 
-export async function POST(request: NextRequest) {
+async function resendHandler(request: NextRequest) {
   try {
     const body = await request.json()
     const validationResult = resendSchema.safeParse(body)
@@ -31,7 +37,7 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const { email } = validationResult.data
+    const email = sanitizeEmail(validationResult.data.email)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
     
     const supabase = getServerClient()
@@ -47,7 +53,7 @@ export async function POST(request: NextRequest) {
     
     if (error) {
       // Don't reveal if email exists or not for security
-      console.error('Resend verification error:', error)
+      logger.error('Resend verification error:', error)
     }
     
     // Always return success to prevent email enumeration
@@ -58,7 +64,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     )
   } catch (error) {
-    console.error('Resend verification error:', error)
+    logger.error('Resend verification error:', error)
     
     if (error instanceof SyntaxError) {
       return NextResponse.json(
@@ -81,3 +87,6 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+// Apply rate limiting: 2 requests per 5 minutes (M2)
+export const POST = withRateLimit(resendHandler, 'resendVerification')

@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { uploadToImgBB, ImgBBUploadError } from '@/lib/imgbb'
 import { withRateLimit } from '@/lib/with-rate-limit'
+import { logger } from '@/lib/logger'
 
 /**
  * Image upload result
@@ -104,7 +105,7 @@ async function uploadImagesHandler(request: NextRequest) {
           size: image.size
         })
       } catch (error) {
-        console.error(`Failed to upload image ${image.name}:`, error)
+        logger.error(`Failed to upload image ${image.name}:`, error)
         
         if (error instanceof ImgBBUploadError) {
           errors.push(`${image.name}: ${error.message}`)
@@ -139,7 +140,7 @@ async function uploadImagesHandler(request: NextRequest) {
       { status: 200 }
     )
   } catch (error) {
-    console.error('Image upload error:', error)
+    logger.error('Image upload error:', error)
     
     return NextResponse.json(
       {
@@ -152,5 +153,5 @@ async function uploadImagesHandler(request: NextRequest) {
   }
 }
 
-// Apply rate limiting: 10 uploads per hour
-export const POST = withRateLimit(uploadImagesHandler, 'uploadFile')
+// Apply rate limiting: 10 uploads per hour (M2)
+export const POST = withRateLimit(uploadImagesHandler, 'uploadImages')

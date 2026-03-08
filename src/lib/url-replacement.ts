@@ -118,3 +118,10 @@ export function replaceAssetUrls(
 function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
+
+/**
+ * Alias for replaceAssetUrls for backward compatibility.
+ * Tests and some code reference this as replaceImageUrls.
+ */
+export const replaceImageUrls = replaceAssetUrls
+

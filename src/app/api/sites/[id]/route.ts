@@ -13,6 +13,7 @@ import { getAdminClient } from '@/lib/supabase'
 import { requireAuth } from '@/lib/auth-utils'
 import { validateSiteName } from '@/lib/validation'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 const updateSiteSchema = z.object({
   name: z.string().min(1).max(100)
@@ -62,7 +63,7 @@ export async function GET(
       .order('path')
 
     if (filesError) {
-      console.error('Database error fetching files:', filesError)
+      logger.error('Database error fetching files:', filesError)
       return NextResponse.json(
         { error: 'Database error', message: 'Failed to fetch site files', statusCode: 500 },
         { status: 500 }
@@ -81,7 +82,7 @@ export async function GET(
       )
     }
 
-    console.error('Error fetching site:', error)
+    logger.error('Error fetching site:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }
@@ -148,7 +149,7 @@ export async function PUT(
       .single()
 
     if (updateError) {
-      console.error('Database error updating site:', updateError)
+      logger.error('Database error updating site:', updateError)
       return NextResponse.json(
         { error: 'Database error', message: 'Failed to update site', statusCode: 500 },
         { status: 500 }
@@ -171,7 +172,7 @@ export async function PUT(
       )
     }
 
-    console.error('Error updating site:', error)
+    logger.error('Error updating site:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }
@@ -221,7 +222,7 @@ export async function DELETE(
       .eq('id', siteId)
 
     if (deleteError) {
-      console.error('Database error deleting site:', deleteError)
+      logger.error('Database error deleting site:', deleteError)
       return NextResponse.json(
         { error: 'Database error', message: 'Failed to delete site', statusCode: 500 },
         { status: 500 }
@@ -240,7 +241,7 @@ export async function DELETE(
       )
     }
 
-    console.error('Error deleting site:', error)
+    logger.error('Error deleting site:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminClient } from '@/lib/supabase'
 import axios from 'axios'
+import { logger } from '@/lib/logger'
+import { validateExternalUrl } from '@/lib/url-validation'
 
 /**
  * Dynamic site serving route
@@ -9,6 +11,7 @@ import axios from 'axios'
  * Returns the HTML directly without any Next.js wrapper.
  * 
  * Requirements: 14, 16
+ * Security: H2 (secure logging), H5 (SSRF protection)
  */
 export async function GET(
   request: NextRequest,
@@ -50,7 +53,14 @@ export async function GET(
       fetchUrl = fetchUrl.replace('pastebin.com/', 'pastebin.com/raw/')
     }
 
-    console.log('Fetching content from:', fetchUrl)
+    // Validate the URL before fetching (H5 - SSRF protection)
+    const urlValidation = validateExternalUrl(fetchUrl)
+    if (!urlValidation.valid) {
+      logger.error('Invalid storage URL detected:', urlValidation.error)
+      return new NextResponse('Failed to load site content', { status: 500 })
+    }
+
+    logger.debug('Fetching site content')
 
     // Retry logic for flaky networks
     let lastError: any
@@ -69,12 +79,12 @@ export async function GET(
         }
 
         content = typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
-        console.log('Content fetched successfully, length:', content.length)
+        logger.debug('Content fetched successfully')
         break
       } catch (err) {
         lastError = err
         if (attempt < 2) {
-          console.log(`Attempt ${attempt + 1} failed, retrying...`)
+          logger.debug(`Fetch attempt ${attempt + 1} failed, retrying...`)
           await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)))
         }
       }
@@ -84,13 +94,13 @@ export async function GET(
       throw lastError || new Error('Failed to fetch content after retries')
     }
   } catch (error) {
-    console.error('Error fetching site content:', error)
+    logger.error('Error fetching site content:', error)
     return new NextResponse('Failed to load site content', { status: 500 })
   }
 
   // Track view asynchronously (non-blocking)
   trackView(site.id).catch(err => {
-    console.error('Failed to track view:', err)
+    logger.error('Failed to track view:', err)
   })
 
   // Inject <base> tag to correctly resolve relative asset paths (like css/style.css)
@@ -124,7 +134,7 @@ async function trackView(siteId: string) {
     await supabase.rpc('increment_views', { site_id: siteId })
     await supabase.from('site_views').insert({ site_id: siteId })
   } catch (error) {
-    console.error('Error tracking view:', error)
+    logger.error('Error tracking view:', error)
   }
 }
 

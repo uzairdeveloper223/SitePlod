@@ -12,6 +12,8 @@ import { getAdminClient } from '@/lib/supabase'
 import { requireAuth } from '@/lib/auth-utils'
 import { uploadToPastebin } from '@/lib/pastebin'
 import axios from 'axios'
+import { logger } from '@/lib/logger'
+import { validateExternalUrl } from '@/lib/url-validation'
 
 /**
  * GET /api/sites/[id]/files/[...path]
@@ -72,6 +74,16 @@ export async function GET(
         // Convert https://pastebin.com/abc123 to https://pastebin.com/raw/abc123
         fetchUrl = fetchUrl.replace('pastebin.com/', 'pastebin.com/raw/')
       }
+
+      // Validate URL before fetching (H5 - SSRF protection)
+      const urlValidation = validateExternalUrl(fetchUrl)
+      if (!urlValidation.valid) {
+        logger.error('Invalid storage URL detected:', urlValidation.error)
+        return NextResponse.json(
+          { error: 'Storage error', message: 'Invalid storage URL', statusCode: 500 },
+          { status: 500 }
+        )
+      }
       
       const response = await axios.get(fetchUrl)
       const content = typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
@@ -86,7 +98,7 @@ export async function GET(
         updatedAt: file.updated_at
       })
     } catch (fetchError) {
-      console.error('Error fetching file content:', fetchError)
+      logger.error('Error fetching file content:', fetchError)
       return NextResponse.json(
         { error: 'Storage error', message: 'Failed to fetch file content from storage', statusCode: 500 },
         { status: 500 }
@@ -100,7 +112,7 @@ export async function GET(
       )
     }
 
-    console.error('Error fetching file:', error)
+    logger.error('Error fetching file:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }
@@ -186,7 +198,7 @@ export async function PUT(
         .single()
 
       if (updateError) {
-        console.error('Database error updating file:', updateError)
+        logger.error('Database error updating file:', updateError)
         return NextResponse.json(
           { error: 'Database error', message: 'Failed to update file record', statusCode: 500 },
           { status: 500 }
@@ -199,7 +211,7 @@ export async function PUT(
         file: updatedFile
       })
     } catch (uploadError) {
-      console.error('Error uploading to Pastebin:', uploadError)
+      logger.error('Error uploading to Pastebin:', uploadError)
       return NextResponse.json(
         { error: 'Storage error', message: 'Failed to upload file content', statusCode: 500 },
         { status: 500 }
@@ -213,7 +225,7 @@ export async function PUT(
       )
     }
 
-    console.error('Error updating file:', error)
+    logger.error('Error updating file:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }

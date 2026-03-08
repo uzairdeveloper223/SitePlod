@@ -13,6 +13,7 @@ import { requireAuth } from '@/lib/auth-utils'
 import { validateSlug, validateSiteName } from '@/lib/validation'
 import { withRateLimit } from '@/lib/with-rate-limit'
 import { z } from 'zod'
+import { logger } from '@/lib/logger'
 
 const createSiteSchema = z.object({
   name: z.string().min(1).max(100),
@@ -42,7 +43,7 @@ async function getHandler(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Database error fetching sites:', error)
+      logger.error('Database error fetching sites:', error)
       return NextResponse.json(
         { error: 'Database error', message: 'Failed to fetch sites', statusCode: 500 },
         { status: 500 }
@@ -58,7 +59,7 @@ async function getHandler(request: NextRequest) {
       )
     }
 
-    console.error('Error fetching sites:', error)
+    logger.error('Error fetching sites:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }
@@ -136,7 +137,7 @@ async function postHandler(request: NextRequest) {
       .single()
 
     if (siteError) {
-      console.error('Database error creating site:', siteError)
+      logger.error('Database error creating site:', siteError)
       return NextResponse.json(
         { error: 'Database error', message: 'Failed to create site', statusCode: 500 },
         { status: 500 }
@@ -157,7 +158,7 @@ async function postHandler(request: NextRequest) {
       .insert(fileRecords)
 
     if (filesError) {
-      console.error('Database error creating files:', filesError)
+      logger.error('Database error creating files:', filesError)
       // Rollback: delete the site
       await supabase.from('sites').delete().eq('id', site.id)
       
@@ -181,7 +182,7 @@ async function postHandler(request: NextRequest) {
       )
     }
 
-    console.error('Error creating site:', error)
+    logger.error('Error creating site:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }

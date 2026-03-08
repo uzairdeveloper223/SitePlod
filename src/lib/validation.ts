@@ -20,6 +20,15 @@ export function validateEmail(email: string): { valid: boolean; error?: string }
   return { valid: true }
 }
 
+/**
+ * Sanitize email input to prevent header injection attacks.
+ * Strips carriage returns, newlines, and null bytes.
+ * Security: M1
+ */
+export function sanitizeEmail(email: string): string {
+  return email.replace(/[\r\n\0]/g, '').trim()
+}
+
 export type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong'
 
 export interface PasswordValidation {

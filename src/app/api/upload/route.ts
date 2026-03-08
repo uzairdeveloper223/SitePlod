@@ -7,6 +7,7 @@
  * uploads text files to Pastebin, and returns file metadata with storage URLs.
  * 
  * Requirements: 5, 6, 7, 21
+ * Security: H2 (secure logging)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -24,6 +25,7 @@ import { uploadToImgBB, ImgBBUploadError } from '@/lib/imgbb'
 import { uploadToPastebin, PastebinUploadError } from '@/lib/pastebin'
 import { replaceAssetUrls, type AssetUrlMapping } from '@/lib/url-replacement'
 import { detectLocalImages, getUniqueImagePaths } from '@/lib/image-detection'
+import { logger } from '@/lib/logger'
 
 /**
  * File metadata structure
@@ -221,7 +223,7 @@ async function uploadHandler(request: NextRequest) {
           )
         }
       } catch (error) {
-        console.error('ZIP extraction error:', error)
+        logger.error('ZIP extraction error:', error)
         return NextResponse.json(
           {
             error: 'Invalid ZIP',
@@ -288,7 +290,7 @@ async function uploadHandler(request: NextRequest) {
         const imgbbUrl = await uploadToImgBB(imageFile.content, imageFile.path)
         assetUrlMap[imageFile.path] = imgbbUrl
       } catch (error) {
-        console.error('ImgBB upload error:', error)
+        logger.error('ImgBB upload error:', error)
 
         if (error instanceof ImgBBUploadError) {
           return NextResponse.json(
@@ -355,7 +357,7 @@ async function uploadHandler(request: NextRequest) {
           size: file.content.length
         })
       } catch (error) {
-        console.error(`Failed to upload ${file.path}:`, error)
+        logger.error(`Failed to upload ${file.path}:`, error)
         if (error instanceof PastebinUploadError) {
           return NextResponse.json({ error: 'Asset upload failed', message: error.message, statusCode: error.statusCode || 500 }, { status: error.statusCode || 500 })
         }
@@ -400,7 +402,7 @@ async function uploadHandler(request: NextRequest) {
       { status: 200 }
     )
   } catch (error) {
-    console.error('Upload error:', error)
+    logger.error('Upload error:', error)
 
     // Handle JSON parse errors
     if (error instanceof SyntaxError) {

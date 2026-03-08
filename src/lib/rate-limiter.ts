@@ -104,6 +104,14 @@ export const RATE_LIMITS = {
   uploadFile: {
     maxRequests: 10,
     windowMs: 60 * 60 * 1000 // 1 hour
+  },
+  uploadImages: {
+    maxRequests: 10,
+    windowMs: 60 * 60 * 1000 // 1 hour
+  },
+  resendVerification: {
+    maxRequests: 2,
+    windowMs: 5 * 60 * 1000 // 5 minutes
   }
 } as const;
 
