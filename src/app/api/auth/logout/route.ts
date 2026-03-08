@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth, AuthError } from '@/lib/auth-utils'
 import { createAuthClient } from '@/lib/supabase'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase.auth.signOut()
     
     if (error) {
-      console.error('Logout error:', error)
+      logger.error('Logout error:', error)
       // Even if signOut fails, we still return success
       // The client should clear the token regardless
     }

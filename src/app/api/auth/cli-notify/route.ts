@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth, AuthError } from '@/lib/auth-utils'
 import { getAdminClient } from '@/lib/supabase'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
     try {
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        console.error('CLI Notification error:', error)
+        logger.error('CLI Notification error:', error)
 
         // Handle unexpected errors
         return NextResponse.json(

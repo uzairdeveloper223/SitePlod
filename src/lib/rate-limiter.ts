@@ -18,7 +18,10 @@ interface RateLimitConfig {
 // In-memory store for rate limit tracking
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
-// Cleanup old entries every 5 minutes
+// Maximum entries to prevent memory leaks under high load (H5)
+const MAX_RATE_LIMIT_ENTRIES = 10000;
+
+// Cleanup old entries every minute (M6: reduced from 5 minutes)
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of rateLimitStore.entries()) {
@@ -26,7 +29,7 @@ setInterval(() => {
       rateLimitStore.delete(key);
     }
   }
-}, 5 * 60 * 1000);
+}, 60 * 1000);
 
 /**
  * Check if a request should be rate limited
@@ -48,6 +51,24 @@ export function checkRateLimit(
   
   // No entry or expired entry - allow and create new
   if (!entry || entry.resetAt < now) {
+    // Evict if at capacity (H5: prevent memory leaks)
+    if (rateLimitStore.size >= MAX_RATE_LIMIT_ENTRIES) {
+      // First pass: remove expired entries
+      for (const [k, v] of rateLimitStore.entries()) {
+        if (v.resetAt < now) rateLimitStore.delete(k);
+      }
+      // Still over limit? Remove oldest entries
+      if (rateLimitStore.size >= MAX_RATE_LIMIT_ENTRIES) {
+        const toRemove = rateLimitStore.size - MAX_RATE_LIMIT_ENTRIES + 1;
+        let removed = 0;
+        for (const k of rateLimitStore.keys()) {
+          if (removed >= toRemove) break;
+          rateLimitStore.delete(k);
+          removed++;
+        }
+      }
+    }
+
     const resetAt = now + config.windowMs;
     rateLimitStore.set(key, {
       count: 1,

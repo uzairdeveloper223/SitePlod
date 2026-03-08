@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth, AuthError } from '@/lib/auth-utils'
 import { getAdminClient } from '@/lib/supabase'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.error('Get current user error:', error)
+    logger.error('Get current user error:', error)
 
     // Handle unexpected errors
     return NextResponse.json(

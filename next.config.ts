@@ -4,9 +4,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   /* config options here */
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
-  reactStrictMode: false,
+  reactStrictMode: true,
   
   // Configure cache headers for site serving routes (Requirement 1.5)
   async headers() {

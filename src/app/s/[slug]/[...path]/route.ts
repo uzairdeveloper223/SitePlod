@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminClient } from '@/lib/supabase'
 import axios from 'axios'
+import { logger } from '@/lib/logger'
+import { validateExternalUrl } from '@/lib/url-validation'
 
 /**
  * Static asset serving route
@@ -10,6 +12,7 @@ import axios from 'axios'
  * Fetches from storage URL and serves with appropriate MIME types.
  * 
  * Requirements: 15
+ * Security: H5 (SSRF protection), H2 (secure logging)
  */
 export async function GET(
   request: NextRequest,
@@ -48,8 +51,14 @@ export async function GET(
     // Convert Pastebin URL to raw URL if needed
     let fetchUrl = file.storage_url
     if (fetchUrl.includes('pastebin.com/') && !fetchUrl.includes('/raw/')) {
-      // Convert https://pastebin.com/abc123 to https://pastebin.com/raw/abc123
       fetchUrl = fetchUrl.replace('pastebin.com/', 'pastebin.com/raw/')
+    }
+
+    // Validate URL before fetching (C1 - SSRF protection)
+    const urlValidation = validateExternalUrl(fetchUrl)
+    if (!urlValidation.valid) {
+      logger.error('Invalid storage URL in asset route:', urlValidation.error)
+      return new NextResponse('Invalid storage URL', { status: 500 })
     }
 
     const response = await axios.get(fetchUrl, {
@@ -63,7 +72,7 @@ export async function GET(
       },
     })
   } catch (error) {
-    console.error('Error fetching asset:', error)
+    logger.error('Error fetching asset:', error)
     return new NextResponse('Error fetching asset', { status: 500 })
   }
 }
@@ -74,4 +83,3 @@ export async function GET(
  */
 export const dynamic = 'force-dynamic'
 export const revalidate = 86400 // Revalidate every 24 hours
-

@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminClient } from '@/lib/supabase'
 import { validateSlug } from '@/lib/validation'
 import { withRateLimit } from '@/lib/with-rate-limit'
+import { logger } from '@/lib/logger'
 
 async function handler(request: NextRequest) {
   try {
@@ -42,7 +43,7 @@ async function handler(request: NextRequest) {
       .maybeSingle()
 
     if (error) {
-      console.error('Database error checking slug:', error)
+      logger.error('Database error checking slug:', error)
       return NextResponse.json(
         { error: 'Database error', message: 'Failed to check slug availability', statusCode: 500 },
         { status: 500 }
@@ -54,7 +55,7 @@ async function handler(request: NextRequest) {
       slug
     })
   } catch (error) {
-    console.error('Error checking slug:', error)
+    logger.error('Error checking slug:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }

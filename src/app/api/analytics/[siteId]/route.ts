@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminClient } from '@/lib/supabase'
 import { requireAuth } from '@/lib/auth-utils'
+import { logger } from '@/lib/logger'
 
 interface ViewsByPeriod {
   date: string
@@ -61,7 +62,7 @@ export async function GET(
       .order('viewed_at', { ascending: false })
 
     if (viewsError) {
-      console.error('Database error fetching views:', viewsError)
+      logger.error('Database error fetching views:', viewsError)
       return NextResponse.json(
         { error: 'Database error', message: 'Failed to fetch analytics', statusCode: 500 },
         { status: 500 }
@@ -130,7 +131,7 @@ export async function GET(
       )
     }
 
-    console.error('Error fetching analytics:', error)
+    logger.error('Error fetching analytics:', error)
     return NextResponse.json(
       { error: 'Server error', message: 'An unexpected error occurred', statusCode: 500 },
       { status: 500 }
