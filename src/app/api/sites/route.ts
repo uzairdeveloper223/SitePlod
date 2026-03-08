@@ -35,7 +35,7 @@ async function getHandler(request: NextRequest) {
   try {
     const userId = await requireAuth(request)
 
-    const supabase = getAdminClient()
+    const supabase = getAdminClient() as any
     const { data: sites, error } = await supabase
       .from('sites')
       .select('*')
@@ -94,7 +94,7 @@ async function postHandler(request: NextRequest) {
       )
     }
 
-    const supabase = getAdminClient()
+    const supabase = getAdminClient() as any
 
     // Check slug availability (case-insensitive)
     const { data: existing } = await supabase

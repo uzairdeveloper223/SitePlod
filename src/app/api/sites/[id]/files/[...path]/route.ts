@@ -28,7 +28,7 @@ export async function GET(
     const { id: siteId, path: pathArray } = await params
     const filePath = pathArray.join('/')
 
-    const supabase = getAdminClient()
+    const supabase = getAdminClient() as any
 
     // Check site ownership
     const { data: site, error: siteError } = await supabase

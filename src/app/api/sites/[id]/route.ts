@@ -31,7 +31,7 @@ export async function GET(
     const userId = await requireAuth(request)
     const { id: siteId } = await params
 
-    const supabase = getAdminClient()
+    const supabase = getAdminClient() as any
 
     // Fetch site
     const { data: site, error: siteError } = await supabase
@@ -114,7 +114,7 @@ export async function PUT(
       )
     }
 
-    const supabase = getAdminClient()
+    const supabase = getAdminClient() as any
 
     // Check site exists and ownership
     const { data: site, error: fetchError } = await supabase
@@ -192,7 +192,7 @@ export async function DELETE(
     const userId = await requireAuth(request)
     const { id: siteId } = await params
 
-    const supabase = getAdminClient()
+    const supabase = getAdminClient() as any
 
     // Check site exists and ownership
     const { data: site, error: fetchError } = await supabase

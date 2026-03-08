@@ -19,7 +19,7 @@ export async function GET(
 ) {
   const { slug } = await params
 
-  const supabase = getAdminClient()
+  const supabase = getAdminClient() as any
 
   // Fetch site by slug
   const { data: site, error: siteError } = await supabase

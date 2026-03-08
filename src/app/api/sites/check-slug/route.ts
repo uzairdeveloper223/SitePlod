@@ -35,7 +35,7 @@ async function handler(request: NextRequest) {
     }
 
     // Check if slug exists (case-insensitive)
-    const supabase = getAdminClient()
+    const supabase = getAdminClient() as any
     const { data, error } = await supabase
       .from('sites')
       .select('id')
